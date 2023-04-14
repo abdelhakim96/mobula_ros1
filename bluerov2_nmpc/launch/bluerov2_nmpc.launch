@@ -1,6 +1,5 @@
 <launch>
     <node name="bluerov2_nmpc_node" pkg="bluerov2_nmpc" type="bluerov2_nmpc" output="screen" />
-    <node name="thrust_allocator" pkg="bluerov2_nmpc" type="thrust_allocator.py" output="screen" />
     <param name="verbose" type="bool" value="true" /> <!-- Parameter to display NMPC messages.-->
     <param name="yaw_control" type="bool" value="true" /> <!-- Parameter to let NMPC control yaw angle.-->
     <param name="online_ref_yaw" type="bool" value="true" /> <!-- Parameter to utilize online reference for yaw angle. -->

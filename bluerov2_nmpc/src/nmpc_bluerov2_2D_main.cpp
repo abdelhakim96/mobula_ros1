@@ -176,7 +176,7 @@ void NMPC_PC::publish_rpyFz(struct command_struct& commandstruct)
     nmpc_wrench_msg.force.z =    commandstruct.control_wrench_vec[2];
     nmpc_wrench_msg.torque.z =   -commandstruct.control_wrench_vec[3];
 
-    nmpc_ctrl_pub.publish(nmpc_wrench_msg);
+    nmpc_cmd_wrench_pub.publish(nmpc_wrench_msg);
 /*
 
 
@@ -372,15 +372,25 @@ int main(int argc, char** argv)
                               current_vel_rate.at(5)
                               };
 
-            ref_trajectory = {ref_position(0),
-                              ref_position(1),
-                              -ref_position(2),
+            //ref_trajectory = {ref_position(0),
+              //                ref_position(1),
+             //                 -ref_position(2),
+              //                0.0,
+              //                0.0,
+               //               0.0,
+               //               ref_yaw_rad,
+               //               0.0
+                //              };  
+
+                    ref_trajectory = {0.0,
                               0.0,
                               0.0,
                               0.0,
-                              ref_yaw_rad,
+                              0.0,
+                              0.0,
+                              0.0,
                               0.0
-                              };                  
+                             };                   
 
 
 
