@@ -211,7 +211,7 @@ int main(int argc, char** argv)
 {
 
 
-    ros::init(argc, argv, "poseaware_nmpc_pc_learning");
+    ros::init(argc, argv, "bluerov2_nmpc_node");
     ros::NodeHandle nh;
 
     ros::param::get("mocap_topic_part", mocap_topic_part);
