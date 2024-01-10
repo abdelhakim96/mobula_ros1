@@ -5,9 +5,9 @@
     <param name="F_y_ref" type="double" value="$(eval 0.0)" /> <!-- Reference for Force in y direction. -->
     <param name="F_z_ref" type="double" value="$(eval 3.95)" /> <!-- Reference for Force in z direction. -->
     <param name="M_z_ref" type="double" value="$(eval 0.0)" /> <!-- Reference for moment about z axis. -->
-    <param name="W_x" type="double" value="10.0" /> <!-- Weight for x-position. -->
-    <param name="W_y" type="double" value="10.0" /> <!-- Weight for y-position. -->
-    <param name="W_z" type="double" value="30.0" /> <!-- Weight for z-position. -->
+    <param name="W_x" type="double" value="50.0" /> <!-- Weight for x-position. -->
+    <param name="W_y" type="double" value="50.0" /> <!-- Weight for y-position. -->
+    <param name="W_z" type="double" value="50.0" /> <!-- Weight for z-position. -->
     <param name="W_u" type="double" value="0.1" /> <!-- Weight for x-velocity. -->
     <param name="W_v" type="double" value="0.1" /> <!-- Weight for y-velocity. -->
     <param name="W_w" type="double" value="4.0" /> <!-- Weight for z-velocity. -->

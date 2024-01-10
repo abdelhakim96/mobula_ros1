@@ -15,7 +15,7 @@
 
 #include <trajectory.h>   // Adding header file: contains all variable types definitions and subscribers/publishers 
 #include <bluerov2_trajectory/set_trajectoryConfig.h>
-double sampleTime = 0.5; 
+double sampleTime = 0.01; 
 // Callback functions
 //dynamicReconfigureCallback Retreives all the data from rqt_reconfigure GUI 
 
@@ -130,9 +130,9 @@ int main(int argc, char** argv)
         if (traj_type == 2)  // Circlular trajectory with specified radius,centre and velocity
             {
                ROS_INFO("--------Circle selected!--------");
-               d_theta = absvel * sampleTime * radius + d_theta;
-               ref_traj_msg.x = wp_x - absvel * cos (d_theta);
-               ref_traj_msg.y = wp_y + absvel * sin (d_theta);
+               d_theta = 0.1 * absvel * sampleTime * radius + d_theta;
+               ref_traj_msg.x = wp_x - 1 * cos (d_theta);
+               ref_traj_msg.y = wp_x + 1 * sin (d_theta);
                ref_traj_msg.z = wp_z;
                ref_yaw_msg.data = wp_yaw;
               // bool init_pos=1;
@@ -155,6 +155,8 @@ int main(int argc, char** argv)
         reg_on_msg.data = reg_on;
         reg_on_pub.publish(reg_on_msg);
         ref_pos_pub.publish(ref_traj_msg);
+        //ref_pos_pub_rviz.publish(ref_traj_msg);
+
         ref_yaw_pub.publish(ref_yaw_msg);
         traj_on_pub.publish(traj_on_msg);
         ros::spinOnce();
