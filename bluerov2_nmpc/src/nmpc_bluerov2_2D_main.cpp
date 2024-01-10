@@ -20,42 +20,6 @@ mavros_msgs::State current_state_msg;
 
 
 
-
-Eigen::MatrixXf pinv(const Eigen::MatrixXf &input, double eps = std::numeric_limits<double>::epsilon())
-{
-
-   
-
-
-    JacobiSVD<Matrix<float, 2, 3>> svd(input, ComputeFullV | ComputeFullU);
-    auto s = svd.singularValues();
-
-    cout<< s.rows() << s.cols()  << endl;
-
-    
-    for (int i = 0; i < std::min(2, 3); i++)
-    {
-
-        cout << "Begin for" << endl;
-        if (s(i) < eps )
-        {
-            s(i) = 0;
-        }
-        else
-        {
-            s(i) = 1 / s(i);
-        }
-
-        cout<< s(i) <<endl;
-
-    }
-
-    
-
-    return svd.matrixV() * s.asDiagonal() * svd.matrixU().transpose();
-}
-
-
 void state_cb(const mavros_msgs::State::ConstPtr& msg)
 {
     current_state_msg = *msg;
@@ -104,6 +68,20 @@ void vel_cb(const geometry_msgs::TwistStamped::ConstPtr& msg)
                         msg->twist.angular.z};
 }
 
+
+void orientation_cb(const geometry_msgs::Vector3Stamped::ConstPtr& msg)
+{   
+    
+    angles = {msg->vector.x*(M_PI/180),
+                   msg->vector.y*(M_PI/180),
+                   msg->vector.z*(M_PI/180)};
+    angles_d ={msg->vector.x,
+                   msg->vector.y,
+                   msg->vector.z}; 
+}
+
+
+// Disturbance estimator Call back functions X, Y,Z
 
 void dist_Fx_predInit_cb(const std_msgs::Bool::ConstPtr& msg)
 {
@@ -164,7 +142,7 @@ void dist_Fz_data_cb(const std_msgs::Float64MultiArray::ConstPtr& msg)
         dist_Fz.data = dist_Fz.data_zeros;
 }
 
-void NMPC_PC::publish_rpyFz(struct command_struct& commandstruct)
+void NMPC_PC::publish_wrench(struct command_struct& commandstruct)
 {
 
     geometry_msgs::Wrench nmpc_wrench_msg;
@@ -174,23 +152,13 @@ void NMPC_PC::publish_rpyFz(struct command_struct& commandstruct)
     nmpc_wrench_msg.force.x =    commandstruct.control_wrench_vec[0];
     nmpc_wrench_msg.force.y =    commandstruct.control_wrench_vec[1];
     nmpc_wrench_msg.force.z =    commandstruct.control_wrench_vec[2];
-    nmpc_wrench_msg.torque.z =   -commandstruct.control_wrench_vec[3];
+
+    nmpc_wrench_msg.torque.x =    0.0;
+    nmpc_wrench_msg.torque.y =    0.0;
+    nmpc_wrench_msg.torque.z =   commandstruct.control_wrench_vec[3];
 
     nmpc_cmd_wrench_pub.publish(nmpc_wrench_msg);
-/*
 
-
-    std_msgs::Float64MultiArray wrench_msg;
-    wrench_msg.layout.dim.push_back(std_msgs::MultiArrayDimension());
-    wrench_msg.layout.dim[0].size = commandstruct.control_wrench_vec.size();
-    wrench_msg.layout.dim[0].stride = 1;
-    wrench_msg.layout.dim[0].label = "Fx, Fy, Fz, Mz";
-    wrench_msg.data.clear();
-    wrench_msg.data.insert(
-        wrench_msg.data.end(), commandstruct.control_wrench_vec.begin(), commandstruct.control_wrench_vec.end());
-    nmpc_cmd_wrench_pub.publish(wrench_msg);
-
-*/
     
 
     std_msgs::Float64 exe_time_msg;
@@ -240,6 +208,7 @@ int main(int argc, char** argv)
     dist_Fx_data_sub = nh.subscribe<std_msgs::Float64MultiArray>(dist_Fx_data_topic, 1, dist_Fx_data_cb);
     dist_Fy_data_sub = nh.subscribe<std_msgs::Float64MultiArray>(dist_Fy_data_topic, 1, dist_Fy_data_cb);
     dist_Fz_data_sub = nh.subscribe<std_msgs::Float64MultiArray>(dist_Fz_data_topic, 1, dist_Fz_data_cb);
+    orientation_sub = nh.subscribe<geometry_msgs::Vector3Stamped>("/mobula/rov/orientation", 1, orientation_cb);
 
     // ----------
     // Publishers
@@ -303,6 +272,8 @@ int main(int argc, char** argv)
     ref_traj_type = 0;
     ref_position << 0, 0, 0;
     ref_velocity << 0, 0, 0;
+
+     angles = { 0,0,0};
     
     control_stop = false;
 
@@ -368,28 +339,19 @@ int main(int argc, char** argv)
                               current_vel_rate.at(0),
                               current_vel_rate.at(1),
                               current_vel_rate.at(2),
-                              current_pos_att.at(5),
+                              angles.at(2),
                               current_vel_rate.at(5)
                               };
 
-            //ref_trajectory = {ref_position(0),
-              //                ref_position(1),
-             //                 -ref_position(2),
-              //                0.0,
-              //                0.0,
-               //               0.0,
-               //               ref_yaw_rad,
-               //               0.0
-                //              };  
 
-                    ref_trajectory = {0.0,
-                              0.0,
-                              0.0,
-                              0.0,
-                              0.0,
-                              0.0,
-                              0.0,
-                              0.0
+                    ref_trajectory = {5.0,  //x
+                                      1.0,  //y
+                                      1.0,   //z
+                                      0.0,   //u
+                                      0.0,   //v
+                                      0.0,   //w
+                                      0*45.0*(M_PI/180),
+                                      0.0
                              };                   
 
 
@@ -408,6 +370,9 @@ int main(int argc, char** argv)
                 std::cout << ref_trajectory[idx] << ",";
             }
             std::cout << "\n";
+
+
+
 
 
 
@@ -439,7 +404,7 @@ int main(int argc, char** argv)
                 exit(0);
             }
 
-            nmpc_pc->publish_rpyFz(nmpc_pc->nmpc_cmd_struct);
+            nmpc_pc->publish_wrench(nmpc_pc->nmpc_cmd_struct);
 
             print_flag_offboard = 1;
             print_flag_arm = 1;
@@ -449,7 +414,7 @@ int main(int argc, char** argv)
             rate.sleep();
         }
 
-        nmpc_pc->publish_rpyFz(nmpc_pc->nmpc_cmd_struct);
+        nmpc_pc->publish_wrench(nmpc_pc->nmpc_cmd_struct);
 
         ros::spinOnce();
         rate.sleep();

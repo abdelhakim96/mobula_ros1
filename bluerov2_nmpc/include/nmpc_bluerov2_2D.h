@@ -99,7 +99,7 @@ public:
                    struct online_data_struct_& online_data,
                    std::vector<double>& statesmeas);
 
-    void publish_rpyFz(struct command_struct& commandstruct);
+    void publish_wrench(struct command_struct& commandstruct);
 
 protected:
     void set_measurements(struct acado_struct& acadostruct,

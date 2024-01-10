@@ -14,6 +14,9 @@
 #include <nav_msgs/Odometry.h> 
 #include <nmpc_bluerov2_2D.h>
 #include <geometry_msgs/Wrench.h>
+
+
+#include <geometry_msgs/Vector3Stamped.h>
 // Subscribers
 ros::Subscriber state_sub;
 
@@ -29,6 +32,8 @@ ros::Subscriber dist_Fz_predInit_sub;
 ros::Subscriber dist_Fx_data_sub;
 ros::Subscriber dist_Fy_data_sub;
 ros::Subscriber dist_Fz_data_sub;
+ros::Subscriber orientation_sub;
+
 
 // Publishers
 ros::Publisher att_throttle_pub;
@@ -60,6 +65,8 @@ Eigen::Vector3d ref_position, ref_velocity;
 double ref_yaw_rad;
 int ref_traj_type;
 std::vector<double> ref_trajectory;
+std::vector<double> angles;
+std::vector<double> angles_d;
 
 double t, t_cc_loop;
 
