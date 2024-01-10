@@ -131,7 +131,7 @@ int main(int argc, char** argv)
             {
                ROS_INFO("--------Circle selected!--------");
                d_theta = absvel * sampleTime * radius + d_theta;
-               ref_traj_msg.x = wp_x + absvel * cos (d_theta);
+               ref_traj_msg.x = wp_x - absvel * cos (d_theta);
                ref_traj_msg.y = wp_y + absvel * sin (d_theta);
                ref_traj_msg.z = wp_z;
                ref_yaw_msg.data = wp_yaw;

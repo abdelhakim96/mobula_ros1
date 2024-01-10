@@ -344,13 +344,13 @@ int main(int argc, char** argv)
                               };
 
 
-                    ref_trajectory = {5.0,  //x
-                                      1.0,  //y
-                                      1.0,   //z
+                    ref_trajectory = {ref_position[0],  //x
+                                      ref_position[1],  //y
+                                      ref_position[2],   //z
                                       0.0,   //u
                                       0.0,   //v
                                       0.0,   //w
-                                      0*45.0*(M_PI/180),
+                                      ref_yaw_rad*(M_PI/180),
                                       0.0
                              };                   
 
