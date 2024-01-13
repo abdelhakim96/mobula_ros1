@@ -54,6 +54,7 @@ ros::Subscriber traj_extern_sub;
 
 
 geometry_msgs::Vector3 ref_traj_msg;
+geometry_msgs::Vector3 ref_vel_msg;
 std::vector<double> current_pos, current_att(3, 0.0);
 geometry_msgs::PoseStamped desired_pos;
 

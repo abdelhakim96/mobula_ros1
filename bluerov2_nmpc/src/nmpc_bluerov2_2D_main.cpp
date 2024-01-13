@@ -74,7 +74,7 @@ void orientation_cb(const geometry_msgs::Vector3Stamped::ConstPtr& msg)
     
     angles = {msg->vector.x*(M_PI/180),
                    msg->vector.y*(M_PI/180),
-                   msg->vector.z*(M_PI/180)};
+                   msg->vector.z*(M_PI/180)};   
     angles_d ={msg->vector.x,
                    msg->vector.y,
                    msg->vector.z}; 
@@ -347,9 +347,9 @@ int main(int argc, char** argv)
                     ref_trajectory = {ref_position[0],  //x
                                       ref_position[1],  //y
                                       ref_position[2],   //z
-                                      0.0,   //u
-                                      0.0,   //v
-                                      0.0,   //w
+                                      ref_velocity[0],   //u
+                                      ref_velocity[1],   //v
+                                      ref_velocity[2],   //w
                                       ref_yaw_rad*(M_PI/180),
                                       0.0
                              };                   

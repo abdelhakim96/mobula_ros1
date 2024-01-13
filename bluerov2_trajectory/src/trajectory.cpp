@@ -43,10 +43,12 @@ void dynamicReconfigureCallback(bluerov2_trajectory::set_trajectoryConfig& confi
 void pos_cb(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
     current_pos = {msg->pose.position.x, msg->pose.position.y, msg->pose.position.z};
+
+    
     current_att_quat = {msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w};
     current_att_mat.setRotation(current_att_quat);
     current_att_mat.getRPY(current_att[0], current_att[1], current_att[2]);
-
+    
 
 }
 
@@ -55,6 +57,15 @@ void traj_extern_cb(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
     desired_pos = *msg;
 }
+
+
+
+
+
+
+
+
+
 
 int main(int argc, char** argv)
 {
@@ -82,12 +93,13 @@ int main(int argc, char** argv)
     // Subscribers
     pos_sub = nh.subscribe<geometry_msgs::PoseStamped>("/mavros/mocap/position", 1, pos_cb);  // get current ROV position (ground truth)
     traj_extern_sub = nh.subscribe<geometry_msgs::PoseStamped>("/trajectory_extern", 1, traj_extern_cb); // get desired trajectory from external source
-  
+    
 
 
      // Sampling time for ros node
     ros::Rate rate(1 / sampleTime);
 
+    
 
     while (ros::ok())
     {
@@ -130,10 +142,32 @@ int main(int argc, char** argv)
         if (traj_type == 2)  // Circlular trajectory with specified radius,centre and velocity
             {
                ROS_INFO("--------Circle selected!--------");
-               d_theta = 0.1 * absvel * sampleTime * radius + d_theta;
-               ref_traj_msg.x = wp_x - 1 * cos (d_theta);
-               ref_traj_msg.y = wp_x + 1 * sin (d_theta);
-               ref_traj_msg.z = wp_z;
+               d_theta =  absvel * sampleTime * radius + d_theta;
+               double d_theta_2 = 2 * absvel * sampleTime * radius + d_theta;
+
+               ref_traj_msg.x = wp_x - radius * cos (d_theta);
+               ref_traj_msg.y = wp_x + radius * sin (d_theta);
+               ref_traj_msg.z = wp_z;      
+               
+
+               double p_x1 = wp_x - radius * cos (d_theta);
+               double p_x2 = wp_x - radius * cos (d_theta_2);
+
+               double p_y1 = wp_x - radius * sin (d_theta);
+               double p_y2 = wp_x - radius * sin (d_theta_2);
+
+               //Transform to body frame 
+                 double u_earth = (p_x2 - p_x1)/sampleTime ;
+                 double v_earth = (p_y2 - p_y1)/sampleTime;
+
+                double u_body = u_earth * cos(current_att[2]) + v_earth * sin(current_att[2]);
+                double v_body = -u_earth * sin(current_att[2]) + v_earth * cos(current_att[2]);
+
+           
+               ref_vel_msg.x = u_body ;
+               ref_vel_msg.y = v_body;
+               ref_vel_msg.z = 0.0;
+               
                ref_yaw_msg.data = wp_yaw;
               // bool init_pos=1;
             }
@@ -156,6 +190,7 @@ int main(int argc, char** argv)
         reg_on_pub.publish(reg_on_msg);
         ref_pos_pub.publish(ref_traj_msg);
         //ref_pos_pub_rviz.publish(ref_traj_msg);
+        ref_vel_pub.publish(ref_vel_msg);
 
         ref_yaw_pub.publish(ref_yaw_msg);
         traj_on_pub.publish(traj_on_msg);

@@ -1,0 +1,11 @@
+<launch>
+    <group ns="gp_wind_regression_x">
+    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_x.launch"/>
+    </group>
+    <group ns="gp_wind_regression_y">
+    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_y.launch"/>
+    </group>
+    <group ns="gp_wind_regression_z">
+    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_z.launch"/>
+    </group>
+</launch>
