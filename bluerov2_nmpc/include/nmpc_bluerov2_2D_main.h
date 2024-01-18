@@ -5,6 +5,8 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <mavros_msgs/State.h>
+
+
 // #include<mavros_msgs/ExtendedState.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float64.h>
@@ -45,7 +47,7 @@ ros::Publisher nmpc_cmd_kkt_pub;
 ros::Publisher nmpc_cmd_obj_pub;
 ros::Publisher nmpc_ctrl_pub;
 ros::Publisher s_sdot_pub;
-
+ros::Publisher nmpc_pred_traj_pub;
 nmpc_struct_ nmpc_struct;
 online_data_struct_ online_data;
 

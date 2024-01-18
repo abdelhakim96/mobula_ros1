@@ -50,9 +50,9 @@ void pos_cb(const nav_msgs::Odometry::ConstPtr& msg)
                         msg->twist.twist.angular.z};
 
 
-    current_att_mat.setRotation(current_att_quat);
+    //current_att_mat.setRotation(current_att_quat);
     //current_att_mat.getRPY(roll, pitch, yaw);
-    current_att_mat.getRPY(pitch, roll, yaw);
+    //current_att_mat.getRPY(pitch, roll, yaw);
     current_pos_att = {msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z, roll, pitch, yaw};
 }
 
@@ -147,7 +147,7 @@ void NMPC_PC::publish_wrench(struct command_struct& commandstruct)
 
     geometry_msgs::Wrench nmpc_wrench_msg;
 
-
+    
     
     nmpc_wrench_msg.force.x =    commandstruct.control_wrench_vec[0];
     nmpc_wrench_msg.force.y =    commandstruct.control_wrench_vec[1];
@@ -174,6 +174,30 @@ void NMPC_PC::publish_wrench(struct command_struct& commandstruct)
     nmpc_cmd_obj_pub.publish(obj_val_msg);
 
 }
+
+
+void NMPC_PC::publish_pred_tarjectory(struct acado_struct& traj_struct)
+{
+      // Create an instance of the Float32MultiArray message type
+    std_msgs::Float64MultiArray pred_traj_msg;
+
+    // Resize the data array based on the size of nmpc_pc->nmpc_struct.x
+   pred_traj_msg.data.resize(NMPC_NX * (NMPC_N + 1));
+
+
+       for (int i = 0; i < NMPC_NX * (NMPC_N + 1); ++i)
+    {
+       // pred_traj_msg.data[i] = traj_struct.x[i];
+        pred_traj_msg.data[i] =  nmpc_struct.x[0+9];
+    }
+   
+
+  nmpc_pred_traj_pub.publish(pred_traj_msg);
+  
+    // a = nmpc_pc->nmpc_struct.x[0+9] <<endl;
+ 
+}
+
 
 int main(int argc, char** argv)
 {
@@ -218,6 +242,8 @@ int main(int argc, char** argv)
     nmpc_cmd_kkt_pub = nh.advertise<std_msgs::Float64>("outer_nmpc_cmd/kkt", 1, true);
     nmpc_cmd_obj_pub = nh.advertise<std_msgs::Float64>("outer_nmpc_cmd/obj", 1, true);
 
+    nmpc_pred_traj_pub = nh.advertise<std_msgs::Float64MultiArray>("nmpc_predicted_trajectory", 1, true); 
+    
     s_sdot_pub = nh.advertise<std_msgs::Float64MultiArray>("outer_nmpc_cmd/s_sdot", 1, true);
 
     nmpc_struct.U_ref.resize(NMPC_NU);
@@ -404,6 +430,10 @@ int main(int argc, char** argv)
                 exit(0);
             }
 
+            std::cout << "thrust input x0"<< nmpc_pc->nmpc_struct.x[1]<<endl;
+            std::cout << "thrust input x1"<< nmpc_pc->nmpc_struct.x[1+9]<<endl;
+
+            nmpc_pc->publish_pred_tarjectory(nmpc_pc->nmpc_struct);
             nmpc_pc->publish_wrench(nmpc_pc->nmpc_cmd_struct);
 
             print_flag_offboard = 1;
@@ -413,8 +443,15 @@ int main(int argc, char** argv)
             ros::spinOnce();
             rate.sleep();
         }
+        
 
+
+
+        
         nmpc_pc->publish_wrench(nmpc_pc->nmpc_cmd_struct);
+        
+
+
 
         ros::spinOnce();
         rate.sleep();

@@ -62,6 +62,7 @@ public:
         int acado_NYN;
         int acado_NU;
         int acado_NOD;
+        
 
         real_t* x0;
         real_t* u;
@@ -100,6 +101,9 @@ public:
                    std::vector<double>& statesmeas);
 
     void publish_wrench(struct command_struct& commandstruct);
+
+
+    void publish_pred_tarjectory(struct  acado_struct& traj_struct);
 
 protected:
     void set_measurements(struct acado_struct& acadostruct,

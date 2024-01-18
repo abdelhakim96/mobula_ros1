@@ -91,6 +91,17 @@ add_dependencies(gp_wind_regression ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin
 # Node linking
 target_link_libraries(gp_wind_regression ${catkin_LIBRARIES} ${libgp_BINARY_LOCATION}/libgp.a)
 
+
+# Node executable
+add_executable(feature_generator src/feature_generator.cpp ${PROJECT_SOURCE})
+
+# Node dependencies
+add_dependencies(feature_generator ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+
+target_link_libraries(feature_generator ${catkin_LIBRARIES} ${libgp_BINARY_LOCATION}/libgp.a)
+
+
 # Install headers
 install(DIRECTORY include
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
