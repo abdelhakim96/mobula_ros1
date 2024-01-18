@@ -4,7 +4,7 @@
 #include <nav_msgs/Odometry.h>
 #include <fstream>
 #include <string>
-#include <cstdio> // Include for file deletion
+#include <cstdio>
 
 std::string file_name = "recorded_data.txt";
 std::ofstream print_results;
@@ -32,10 +32,30 @@ void rov_odometry_cb(const nav_msgs::Odometry::ConstPtr& msg) {
 
 void write_data_to_file(const ros::TimerEvent& event) {
     print_results.open(file_name.c_str(), std::ios_base::app);
-    print_results << ref_position.x << "," << ref_position.y << "," << ref_position.z << "," << ref_yaw.data << ",";
+
+    // Calculate position error
+    double position_error_x = rov_odometry.pose.pose.position.x - ref_position.x;
+    double position_error_y = rov_odometry.pose.pose.position.y - ref_position.y;
+    double position_error_z = rov_odometry.pose.pose.position.z - ref_position.z;
+
+    // Calculate velocity error
+    double velocity_error_x = rov_odometry.twist.twist.linear.x - ref_velocity.x;
+    double velocity_error_y = rov_odometry.twist.twist.linear.y - ref_velocity.y;
+    double velocity_error_z = rov_odometry.twist.twist.linear.z - ref_velocity.z;
+
+    // Print data to file including errors
+    print_results << ref_position.x << "," << ref_position.y << "," << ref_position.z << ",";
     print_results << rov_odometry.pose.pose.position.x << "," << rov_odometry.pose.pose.position.y << "," << rov_odometry.pose.pose.position.z << ",";
+    print_results << position_error_x << "," << position_error_y << "," << position_error_z << ",";
+
+    print_results << ref_velocity.x << "," << ref_velocity.y << "," << ref_velocity.z << ",";
+    print_results << rov_odometry.twist.twist.linear.x << "," << rov_odometry.twist.twist.linear.y << "," << rov_odometry.twist.twist.linear.z << ",";
+    print_results << velocity_error_x << "," << velocity_error_y << "," << velocity_error_z << ",";
+
     // Assuming yaw is stored in the quaternion
-    print_results << rov_odometry.pose.pose.orientation.z << std::endl;  // Extract yaw from the quaternion if available
+    print_results << ref_yaw.data << ",";
+    print_results << rov_odometry.pose.pose.orientation.z << std::endl;
+
     print_results.close();
 }
 

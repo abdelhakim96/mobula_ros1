@@ -62,9 +62,9 @@ public:
     //traj_sub = nh.subscribe<std_msgs::Float64MultiArray>("nmpc_pred_traj", 1, &FeatureGeneratorNode::trajectoryCallback, this);
 
     // Advertise the gp_features topic
-    gp_x_features_pub = nh.advertise<std_msgs::Float64MultiArray>("/gp_feature_data", 1);
-    gp_y_features_pub = nh.advertise<std_msgs::Float64MultiArray>("gp_features_y", 1);
-    gp_z_features_pub = nh.advertise<std_msgs::Float64MultiArray>("gp_features_z", 1);
+    gp_x_features_pub = nh.advertise<std_msgs::Float64MultiArray>("/dev/gp/feature_x_filtered", 1);
+    gp_y_features_pub = nh.advertise<std_msgs::Float64MultiArray>("/dev/gp/feature_y_filtered", 1);
+    gp_z_features_pub = nh.advertise<std_msgs::Float64MultiArray>("/dev/gp/feature_z_filtered", 1);
 
     // Initialize last_trajectory_data with zeros
     last_trajectory_data.resize(3, 0.0);
@@ -126,10 +126,15 @@ int main(int argc, char **argv) {
 while(ros::ok)
 
 {
-     
+     //Model
 //acceleration[0] == (control[0] + (m * velocity[1] + Y_vd * velocity[1]) * velocity[5] + (X_u + X_uc *sqrt( velocity[0] * velocity[0] ) ) * velocity[0])/(m - X_ud) + Fx_dist ;
 //acceleration[1] == (control[1] - (m * velocity[0] + X_ud * velocity[0]) * velocity[5] + (Y_v + Y_vc *sqrt( velocity[1] * velocity[1] ) ) * velocity[1])/(m - Y_vd) + Fy_dist ;
 //acceleration[2] == (control[2] + (control[3] + Z_wc * sqrt(velocity[2] * velocity[2])) * velocity[2] + (m * g - F_bouy))/(m - Z_wd) + Fz_dist ;
+
+    gp_x_features_msg.data.clear();
+    gp_y_features_msg.data.clear();
+    gp_z_features_msg.data.clear();
+
 
 double Fx_dist = (m - X_ud) * acceleration[0] - (control[0] + (m * velocity[1] + Y_vd * velocity[1]) * velocity[5] + (X_u + X_uc * sqrt(velocity[0] * velocity[0])) * velocity[0]);
 double Fy_dist = (m - Y_vd) * acceleration[1] - (control[1] - (m * velocity[0] + X_ud * velocity[0]) * velocity[5] + (Y_v + Y_vc * sqrt(velocity[1] * velocity[1])) * velocity[1]);
