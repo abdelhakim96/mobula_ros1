@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 
 # File paths containing the recorded data
-file_name_gp = "recorded_data_gp.txt"
-file_name_nogp2 = "recorded_data_nogp2.txt"
+file_name_gp = "recorded_data_gp_dist.txt"
+file_name_nogp2 = "recorded_data_nogp_dist.txt"
 
 # Lists to store the trajectory data
 ref_positions_x_gp = []

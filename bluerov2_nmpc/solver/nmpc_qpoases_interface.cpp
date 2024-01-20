@@ -42,7 +42,7 @@ int nmpc_solve( void )
 
 	QProblemB qp( 128 );
 	
-	returnValue retVal = qp.init(nmpcWorkspace.H, nmpcWorkspace.g, nmpcWorkspace.lb, nmpcWorkspace.ub, nmpc_nWSR, nmpcWorkspace.y);
+	returnValue retVal = qp.init(nmpcWorkspace.H, nmpcWorkspace.g, nmpcWorkspace.lb, nmpcWorkspace.ub, nmpc_nWSR);
 
     qp.getPrimalSolution( nmpcWorkspace.x );
     qp.getDualSolution( nmpcWorkspace.y );

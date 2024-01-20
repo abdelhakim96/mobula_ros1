@@ -430,8 +430,8 @@ int main(int argc, char** argv)
                 exit(0);
             }
 
-            std::cout << "thrust input x0"<< nmpc_pc->nmpc_struct.x[1]<<endl;
-            std::cout << "thrust input x1"<< nmpc_pc->nmpc_struct.x[1+9]<<endl;
+            std::cout << "predicted dist x "<< online_data.distFx[0]<<endl;
+           /// std::cout << "thrust input x1"<< nmpc_pc->nmpc_struct.x[1+9]<<endl;
 
             nmpc_pc->publish_pred_tarjectory(nmpc_pc->nmpc_struct);
             nmpc_pc->publish_wrench(nmpc_pc->nmpc_cmd_struct);
