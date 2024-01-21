@@ -2,8 +2,8 @@
 // Copyright (c) 2011, Manuel Blum <mblum@informatik.uni-freiburg.de>
 // All rights reserved.
 
-#ifndef __GP_SPARSE_H__
-#define __GP_SPARSE_H__
+#ifndef __AGP_SPARSE_H__
+#define __AGP_SPARSE_H__
 
 #include <Eigen/Sparse>
 #include <Eigen/SparseCholesky>
@@ -15,20 +15,20 @@ namespace libgp {
   /** Sparse Gaussian process regression.
    *  @author Manuel Blum 
    *  Modified by Mohit Mehndiratta */
-  class SparseGaussianProcess : public GaussianProcess
+  class AdaptiveSparseGaussianProcess : public GaussianProcess
   {
   public:
     
-    /** Create an instance of SparseGaussianProcess with given input dimensionality and covariance function. */
-    SparseGaussianProcess (size_t input_dim, std::string covf_def, size_t _max_points);
+    /** Create an instance of AdaptiveSparseGaussianProcess with given input dimensionality and covariance function. */
+    AdaptiveSparseGaussianProcess (size_t input_dim, std::string covf_def, size_t _max_points);
     
-    /** Create an instance of SparseGaussianProcess from file. */
-    SparseGaussianProcess (const char * filename);
+    /** Create an instance of AdaptiveSparseGaussianProcess from file. */
+    AdaptiveSparseGaussianProcess (const char * filename);
     
-    /** Create an instance of SparseGaussianProcess from Copy constructor */
-    SparseGaussianProcess (size_t _max_points, const GaussianProcess& gp);
+    /** Create an instance of AdaptiveSparseGaussianProcess from Copy constructor */
+    AdaptiveSparseGaussianProcess (size_t _max_points, const GaussianProcess& gp);
 
-    virtual ~SparseGaussianProcess ();
+    virtual ~AdaptiveSparseGaussianProcess ();
     
     /** to compute necessary matrices */
 //    virtual void initialize(Eigen::VectorXd &_mu_star, Eigen::VectorXd &_sx_star2);
@@ -42,6 +42,10 @@ namespace libgp {
 
     /** Obtain mean and variance together to save computation */
     virtual std::pair<double, double> f_var(const double x[]);
+
+
+
+    virtual double f(const double x[], double lamb);
 
     std::tuple<Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd>
       compute_KmmKuuKmu(SampleSet * sampleset_m, SampleSet * sampleset_u);
@@ -91,4 +95,4 @@ namespace libgp {
   };
 }
 
-#endif /* __GP_SPARSE_H__ */
+#endif /* __AGP_SPARSE_H__ */

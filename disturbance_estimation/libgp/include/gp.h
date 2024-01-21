@@ -50,7 +50,7 @@ namespace libgp {
     /** Predict target value for given input.
      *  @param x input vector
      *  @return predicted value */
-    virtual double f(const double x[]);
+    virtual double f(const double x[], const double lamb = 1.0);
 
     // Added by Mohit
     /** Predict target value for given noisy input.

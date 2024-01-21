@@ -4,30 +4,30 @@
 
 // Modified by Mohit Mehndiratta <mohit005@e.ntu.edu.sg> 2019
 
-#include "gp_sparse.h"
+#include "gp_asparse.h"
 
 namespace libgp {
   
   const double log2pi = log(2*M_PI);
 
-  SparseGaussianProcess::SparseGaussianProcess (size_t input_dim, std::string covf_def, size_t _max_points) : GaussianProcess(input_dim, covf_def)
+  AdaptiveSparseGaussianProcess::AdaptiveSparseGaussianProcess (size_t input_dim, std::string covf_def, size_t _max_points) : GaussianProcess(input_dim, covf_def)
   {
     max_points = _max_points;
   }
   
-  SparseGaussianProcess::SparseGaussianProcess (const char * filename) : GaussianProcess(filename)
+  AdaptiveSparseGaussianProcess::AdaptiveSparseGaussianProcess (const char * filename) : GaussianProcess(filename)
   {
     max_points = this->sampleset->size();
   }
   
-  SparseGaussianProcess::SparseGaussianProcess (size_t _max_points, const GaussianProcess& gp) : GaussianProcess(gp)
+  AdaptiveSparseGaussianProcess::AdaptiveSparseGaussianProcess (size_t _max_points, const GaussianProcess& gp) : GaussianProcess(gp)
   {
     max_points = _max_points;
   }
 
-  SparseGaussianProcess::~SparseGaussianProcess () {}  
+  AdaptiveSparseGaussianProcess::~AdaptiveSparseGaussianProcess () {}  
   
-  void SparseGaussianProcess::sparsify()
+  void AdaptiveSparseGaussianProcess::sparsify()
   {
 //    // initialize the required matrices
 //    initialize(_mu_star, _sx_star2);
@@ -62,7 +62,7 @@ namespace libgp {
     sampleset = sampleset_indpts;
   }
 
-  int SparseGaussianProcess::get_most_dense_point(size_t D, size_t N,
+  int AdaptiveSparseGaussianProcess::get_most_dense_point(size_t D, size_t N,
                                                   const Eigen::MatrixXd& distances)
   {
     double min_dist = std::numeric_limits<double>::max();
@@ -88,7 +88,7 @@ namespace libgp {
     return denser;
   }
 
-  void SparseGaussianProcess::prior_meanVar(SampleSet * _sampleset)
+  void AdaptiveSparseGaussianProcess::prior_meanVar(SampleSet * _sampleset)
   {
     size_t n = sampleset->size();
     size_t nu = _sampleset->size();
@@ -129,7 +129,7 @@ namespace libgp {
   }
 
   std::tuple<Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd>
-    SparseGaussianProcess::compute_KmmKuuKmu(SampleSet * sampleset_m, SampleSet * sampleset_u)
+    AdaptiveSparseGaussianProcess::compute_KmmKuuKmu(SampleSet * sampleset_m, SampleSet * sampleset_u)
   {
     size_t n = sampleset_m->size();
     size_t nu = sampleset_u->size();
@@ -161,7 +161,7 @@ namespace libgp {
     return std::make_tuple(Kmm, Kuu, Kmu);
   }
 
-  void SparseGaussianProcess::update_alpha()
+  void AdaptiveSparseGaussianProcess::update_alpha()
   {
 //    std::cout<<"alpha = "<<alpha<<"\n";
     // can previously computed values be used?
@@ -179,7 +179,7 @@ namespace libgp {
 //    std::cout<<"alpha = "<<alpha<<"\n";
   }
 
-  double SparseGaussianProcess::var(const double x[])
+  double AdaptiveSparseGaussianProcess::var(const double x[])
   {
     if (sampleset->empty()) return 0;
     Eigen::Map<const Eigen::VectorXd> x_star(x, input_dim);
@@ -200,11 +200,14 @@ namespace libgp {
     return cf->get(x_star, x_star) - v.dot(Suu*v);
   }
   
-  std::pair<double, double> SparseGaussianProcess::f_var(const double x[])
+  std::pair<double, double> AdaptiveSparseGaussianProcess::f_var(const double x[])      //modify
   {
     if (sampleset->empty()) return std::make_pair(0, 0);
     Eigen::Map<const Eigen::VectorXd> x_star(x, input_dim);
-    compute();
+  
+  
+    compute(); // perform cholesky factorization: L = chol(L)
+               //solver.compute(K.selfadjointView<Eigen::Lower>());
     update_alpha();
     update_k_star(x_star);
     int n = sampleset->size();
@@ -212,80 +215,12 @@ namespace libgp {
     Eigen::VectorXd v = L.topLeftCorner(n, n).triangularView<Eigen::Lower>().solve(k_star);
     // v = inv(L')*v
     L.topLeftCorner(n, n).triangularView<Eigen::Lower>().transpose().solveInPlace(v);
-
+    
     return std::make_pair(k_star.dot(alpha), cf->get(x_star, x_star) - v.dot(Suu*v));
   }
 
-//  void SparseGaussianProcess::initialize(Eigen::VectorXd &_mu_star, Eigen::VectorXd &_sx_star2)
-//  {
-//    // prior mean and variance of the induced points distribution
-//    mu_star = _mu_star;
-//    sx_star2 = _sx_star2;
 
-//    ell2.setZero(input_dim);
-//    if (cf->get_param_dim()-2 > 1)
-//    {
-//      for(size_t i = 0; i < input_dim; ++i)
-//        ell2(i) = exp(2*(cf->get_loghyper())(i));
-//      sqrt_det_ell2_by_det_ell2_p_2sx2 = sqrt((ell2.prod())/(ell2+2*sx_star2).prod());
-//    }
-//    else
-//    {
-//      for(size_t i = 0; i < input_dim; ++i)
-//        ell2(i) = exp(2*(cf->get_loghyper())(0));
-//      sqrt_det_ell2_by_det_ell2_p_2sx2 = sqrt((ell2(0))/(ell2(0)+2*sx_star2(0)));
-//    }
-//    sf2 = exp(2*(cf->get_loghyper())(cf->get_param_dim()-2));
-
-//    Kmm.resize(initial_L_size, initial_L_size);
-//    Kmm = (L.topLeftCorner(sampleset->size(), sampleset->size())*L.topLeftCorner(sampleset->size(), sampleset->size()).transpose()).triangularView<Eigen::Lower>();
-//  }
-
-//  double SparseGaussianProcess::expected_post_var(SampleSet *& _sampleset)
-//  {
-//    size_t n = sampleset->size();
-//    size_t nu = _sampleset->size();
-
-//    Eigen::MatrixXd Kuu(nu, nu), Kmu(n, nu);
-//    std::tie(Kuu, Kmu) = compute_KuuKmu(sampleset, _sampleset);
-
-//    Eigen::MatrixXd P(nu, nu), Q = Eigen::MatrixXd::Identity(n, n);
-//    // compute Q =  Kmu*inv(Kuu)
-//    Kuu.selfadjointView<Eigen::Lower>().llt().solveInPlace(Q);
-//    Q = Kmu*Q;
-////    std::cout<<"Q = "<<Q<<"\n";
-
-//    // compute P =  Q'*inv(Kmm + Sfm)*Q
-//    P = Q.transpose()*Kmm.selfadjointView<Eigen::Lower>().llt().solve(Q);
-////    std::cout<<"P = "<<P<<"\n";
-
-//    double sum = 0;
-//    for(size_t i = 0; i < nu; ++i)
-//    {
-//      for(size_t j = 0; j <= i; ++j)
-//      {
-//        if (i==j)
-//          sum = sum + P(i,j)*exp(-0.5*(_sampleset->x(i)-_sampleset->x(j))
-//                                     .cwiseQuotient(2*ell2)
-//                                     .dot(_sampleset->x(i)-_sampleset->x(j)))
-//                            *exp(-0.5*(0.5*(_sampleset->x(i)+_sampleset->x(j))-mu_star)
-//                                     .cwiseQuotient(0.5*ell2+sx_star2)
-//                                     .dot(0.5*(_sampleset->x(i)+_sampleset->x(j))-mu_star));
-//        else
-//          sum = sum + 2*P(i,j)*exp(-0.5*(_sampleset->x(i)-_sampleset->x(j))
-//                                       .cwiseQuotient(2*ell2)
-//                                       .dot(_sampleset->x(i)-_sampleset->x(j)))
-//                              *exp(-0.5*(0.5*(_sampleset->x(i)+_sampleset->x(j))-mu_star)
-//                                       .cwiseQuotient(0.5*ell2+sx_star2)
-//                                       .dot(0.5*(_sampleset->x(i)+_sampleset->x(j))-mu_star));
-//      }
-//    }
-//    return sf2 - sf2*sf2*sqrt_det_ell2_by_det_ell2_p_2sx2*sum;
-//  }
-
-  /** add sample and update the GP. If the number of samples is bigger than
-   *  the desired maximum points, we re-sparsify and re-compute the GP */
-  void SparseGaussianProcess::add_pattern(const double x[], double y)
+  void AdaptiveSparseGaussianProcess::add_pattern(const double x[], double y)
   {
     this->GaussianProcess::add_pattern(x, y);
 //    std::cout<<"L = "<<L.topLeftCorner(sampleset->size(), sampleset->size())<<"\n";
@@ -298,7 +233,7 @@ namespace libgp {
   }
 
   /// remove row from an Eigen matrix
-  void SparseGaussianProcess::remove_row(Eigen::MatrixXd& matrix, unsigned int rowToRemove)
+  void AdaptiveSparseGaussianProcess::remove_row(Eigen::MatrixXd& matrix, unsigned int rowToRemove)
   {
       unsigned int numRows = matrix.rows() - 1;
       unsigned int numCols = matrix.cols();
@@ -310,7 +245,7 @@ namespace libgp {
   }
 
   /// remove column from an Eigen matrix
-  void SparseGaussianProcess::remove_column(Eigen::MatrixXd& matrix, unsigned int colToRemove)
+  void AdaptiveSparseGaussianProcess::remove_column(Eigen::MatrixXd& matrix, unsigned int colToRemove)
   {
       unsigned int numRows = matrix.rows();
       unsigned int numCols = matrix.cols() - 1;
@@ -321,12 +256,12 @@ namespace libgp {
       matrix.conservativeResize(numRows, numCols);
   }
 
-  size_t SparseGaussianProcess::get_max_points()
+  size_t AdaptiveSparseGaussianProcess::get_max_points()
   {
     return max_points;
   }
 
-  void SparseGaussianProcess::set_max_points(size_t _max_points)
+  void AdaptiveSparseGaussianProcess::set_max_points(size_t _max_points)
   {
     max_points = _max_points;
   }

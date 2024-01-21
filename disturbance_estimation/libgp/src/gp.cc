@@ -159,7 +159,7 @@ GaussianProcess::~GaussianProcess()
         delete cf;
 }
 
-double GaussianProcess::f(const double x[])
+double GaussianProcess::f(const double x[],  const double lambda )
 {
     if (sampleset->empty())
         return 0;
@@ -168,6 +168,24 @@ double GaussianProcess::f(const double x[])
     update_alpha();
     update_k_star(x_star);
     // expected_f_star = k_star'*alpha
+
+        //added by hakim
+   // double lamb=1;
+   // int n = 100;
+   // Eigen::MatrixXd Lambda_m = Eigen::MatrixXd::Identity(n, n);
+    //Lambda_m(0,0) = 1.0;  // Last element is always 1.0.
+   // for (int i = n - 2; i >= 0; i--) {
+   //     Lambda_m(i, i) = Lambda_m(i + 1, i + 1) * lamb;
+   // }
+    
+   //std::cout << "Lambda_m matrix:\n" << Lambda_m << std::endl;
+
+   // alpha=Lambda_m*alpha;
+    
+    //std::cout << "Lambda Rows: " << Lambda_m.rows() << std::endl;
+    //std::cout << "Lambda Cols: " << Lambda_m.cols() << std::endl;
+    //std::cout << "alpha Rows: " << alpha.rows() << std::endl;
+    //std::cout << "alpha Cols: " << alpha.cols() << std::endl;
     return k_star.dot(alpha);
 }
 
