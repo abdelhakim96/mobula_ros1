@@ -163,7 +163,7 @@ namespace libgp {
     /** Update test input (with noise) and cache kernel vector. */
     void update_k_star_noisy_inp(const Eigen::VectorXd &x_star, Eigen::VectorXd &sx2);
 
-    virtual void update_alpha();
+    virtual void update_alpha(double lamb =1.0);
 
     /** Compute covariance matrix and perform cholesky decomposition. */
     virtual void compute();

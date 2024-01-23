@@ -161,7 +161,7 @@ namespace libgp {
     return std::make_tuple(Kmm, Kuu, Kmu);
   }
 
-  void AdaptiveSparseGaussianProcess::update_alpha()
+  void AdaptiveSparseGaussianProcess::update_alpha(double lamb)
   {
     // can previously computed values be used?
     if (!alpha_needs_update)
@@ -393,7 +393,7 @@ double AdaptiveSparseGaussianProcess::f(const double x[], const double lamb = 1.
     size_t nu = sampleset->size() ;
 
     //double lamb=0.6;
-    double sigma =0.00000001;
+    double sigma =0.00000000000000000001;
     Eigen::MatrixXd Lambda_m = Eigen::MatrixXd::Identity(n, n);
     Lambda_m(0,0) = 1.0;  // Last element is always 1.0.
     for (int i = n - 2; i >= 0; i--) {

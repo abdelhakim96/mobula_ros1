@@ -65,7 +65,7 @@ namespace libgp {
     /** Prior covariance matrix for induced points */
     Eigen::MatrixXd Suu;
 
-    virtual void update_alpha();
+    virtual void update_alpha(double lamb = 1.0);
 
     virtual void prior_meanVar(SampleSet * _sampleset);
 
