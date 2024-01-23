@@ -403,12 +403,28 @@ int main(int argc, char** argv)
 
 
 
+           double F_d_max = 50;
 
+          //  online_data.distFx = std::min(dist_Fx.data, F_d_max);
+          //  online_data.distFy = std::min(dist_Fy.data, F_d_max);
+          //  online_data.distFz = std::min(dist_Fz.data, F_d_max);
+          //cap disturbance to F_dmax
+                for (size_t i = 0; i < dist_Fx.data.size(); ++i) {
+                    dist_Fx.data[i] = std::min(std::max(dist_Fx.data[i], -F_d_max), F_d_max);
+                    dist_Fy.data[i] = std::min(std::max(dist_Fy.data[i], -F_d_max), F_d_max);
+                    dist_Fz.data[i] = std::min(std::max(dist_Fz.data[i], -F_d_max), F_d_max);
+                }
+
+
+                
            online_data.distFx = dist_Fx.data;
            online_data.distFy = dist_Fy.data;
-           online_data.distFz = dist_Fz.data;
+           online_data.distFz = dist_Fx.data_zeros;
 
 
+          ROS_ERROR_STREAM("online_data = " << online_data.distFx[0] << " (sec)");
+          ROS_ERROR_STREAM("online_data = " << online_data.distFy[0] << " (sec)");
+          ROS_ERROR_STREAM("online_data = " << online_data.distFz[0] << " (sec)");
 
 
 

@@ -102,9 +102,10 @@ void GPModelBase::addPatternwithRemoval(libgp::GaussianProcess*& gp, const size_
 void GPModelBase::computeMeanVariance(libgp::GaussianProcess*& gp,
                                       const double& mean_0,
                                       const size_t& idx,
-                                      double points[])
+                                      double points[],
+                                      double lamb)
 {
-    prediction_data_.mean_[idx] = mean_0 + gp->f(points);
+    prediction_data_.mean_[idx] = mean_0 + gp->f(points,lamb);
     prediction_data_.variance_[idx] = gp->var(points);
     computeUnstandardizedPredictionData(idx);
 }

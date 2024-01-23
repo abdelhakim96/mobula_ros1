@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, "data_recorder");
     ros::NodeHandle nh;
 
-    //delete_existing_file(); // Delete existing file before starting data recording
+    delete_existing_file(); // Delete existing file before starting data recording
 
     ros::Subscriber ref_pos_sub = nh.subscribe<geometry_msgs::Vector3>("ref_trajectory/position", 1, ref_position_cb);
     ros::Subscriber ref_vel_sub = nh.subscribe<geometry_msgs::Vector3>("ref_trajectory/velocity", 1, ref_velocity_cb);

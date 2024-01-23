@@ -159,34 +159,107 @@ GaussianProcess::~GaussianProcess()
         delete cf;
 }
 
-double GaussianProcess::f(const double x[],  const double lambda )
+double GaussianProcess::f(const double x[],  const double lamb )
 {
+    //if (sampleset->empty())
+   //     return 0;
+   // Eigen::Map<const Eigen::VectorXd> x_star(x, input_dim);
+   // compute();
+   // update_alpha();
+   // update_k_star(x_star);
+   // return k_star.dot(alpha);
+
+   // added by hakim
+    size_t n = sampleset->size() ;
+    size_t nu = sampleset->size() ;
+
+    //double lamb=0.6;
+    double sigma =0.00000001;
+    Eigen::MatrixXd Lambda_m = Eigen::MatrixXd::Identity(n, n);
+    Lambda_m(0,0) = 1.0;  // Last element is always 1.0.
+    for (int i = n - 2; i >= 0; i--) {
+        Lambda_m(i, i) = Lambda_m(i + 1, i + 1) * lamb;
+    }
+   
+   
+
+
+
+
+
+   //Matrices
+
     if (sampleset->empty())
         return 0;
+ 
     Eigen::Map<const Eigen::VectorXd> x_star(x, input_dim);
-    compute();
-    update_alpha();
+    Eigen::MatrixXd Kxx = Eigen::MatrixXd::Identity(n, n);
+    Eigen::MatrixXd Kxu = Eigen::MatrixXd::Identity(n, nu);
+    Eigen::MatrixXd Ksu = Eigen::MatrixXd::Identity(1, nu);
+    Eigen::MatrixXd Kuu = Eigen::MatrixXd::Identity(nu, nu);
+    Eigen::MatrixXd I = Eigen::MatrixXd::Identity(nu, nu);
+    Eigen::MatrixXd iK_uu = Eigen::MatrixXd::Identity(nu, nu);
+    Eigen::MatrixXd L_B = Eigen::MatrixXd::Identity(nu, nu);
+    Eigen::MatrixXd B_lambda = Eigen::MatrixXd::Identity(nu, nu);
+
+
+    for(size_t i = 0; i < nu; ++i) {
+      for(size_t j = 0; j <= i; ++j) {
+        (Kuu)(i, j) = cf->get(sampleset->x(i), sampleset->x(j));
+      }
+    }
+
+        for(size_t i = 0; i < n; ++i) {
+      for(size_t j = 0; j <= i; ++j) {
+        (Kxx)(i, j) = cf->get(sampleset->x(i), sampleset->x(j));
+      }
+    }
+
+
+    for(size_t i = 0; i < n; ++i) {
+      for(size_t j = 0; j < nu; ++j) {
+        // TO BE: check if the values for noise covariance is coming up in the below evaluation
+        (Kxu)(i, j) = cf->get(sampleset->x(i), sampleset->x(j));
+      }
+    }
+
+
+    Eigen::MatrixXd iB_lambda = Kuu + pow(sigma, -2) * (Kxu.transpose() * Lambda_m * Kxu);
+
+    
+    // compute inverses using Chelosky decomp
+    B_lambda = iB_lambda.llt().solve(I);
+    iK_uu = Kuu.llt().solve(I);
+
+
+    const std::vector<double>& targets = sampleset->y();
+    Eigen::Map<const Eigen::VectorXd> y(&targets[0], sampleset->size());
+
     update_k_star(x_star);
-    // expected_f_star = k_star'*alpha
-
-        //added by hakim
-   // double lamb=1;
-   // int n = 100;
-   // Eigen::MatrixXd Lambda_m = Eigen::MatrixXd::Identity(n, n);
-    //Lambda_m(0,0) = 1.0;  // Last element is always 1.0.
-   // for (int i = n - 2; i >= 0; i--) {
-   //     Lambda_m(i, i) = Lambda_m(i + 1, i + 1) * lamb;
-   // }
     
-   //std::cout << "Lambda_m matrix:\n" << Lambda_m << std::endl;
 
-   // alpha=Lambda_m*alpha;
-    
-    //std::cout << "Lambda Rows: " << Lambda_m.rows() << std::endl;
-    //std::cout << "Lambda Cols: " << Lambda_m.cols() << std::endl;
-    //std::cout << "alpha Rows: " << alpha.rows() << std::endl;
-    //std::cout << "alpha Cols: " << alpha.cols() << std::endl;
-    return k_star.dot(alpha);
+    Eigen::MatrixXd mu = pow(sigma, -2) * k_star.transpose() * B_lambda * Kxu.transpose() * Lambda_m * y;
+
+
+
+   // Eigen::MatrixXd mu ;
+
+
+
+
+
+
+
+  std::cout << "k_star: " << k_star.rows() << std::endl;
+  std::cout << "k_star: " << k_star.cols() << std::endl;
+  std::cout << "B_lambda: " << B_lambda.rows() << std::endl;
+  std::cout << "B_lambda: " << B_lambda.cols() << std::endl;
+    std::cout << "Kxu: " << Kxu.rows() << std::endl;
+  std::cout << "Kxu: " << Kxu.cols() << std::endl;
+    //mu = k_star.transpose()*alpha;
+    std::cout << "mu: " << mu(0,0) << std::endl;
+
+    return mu(0,0);
 }
 
 // Added by Mohit

@@ -97,11 +97,11 @@ void GPModelTypeConcatenated::initialize(const FeatureDataStruct& feature_data, 
         }
     }
 }
-
+//implement forgetting here!!
 void GPModelTypeConcatenated::core(const FeatureDataStruct& feature_data)
 {
     regression_data_model_->prepareRegressionData(getStandardizedFeatureData(feature_data));
-
+    
     // add training patterns with removal from the front of the moving window
     if (gp_params_.use_gp_initial_)
     {
@@ -114,12 +114,24 @@ void GPModelTypeConcatenated::core(const FeatureDataStruct& feature_data)
     }
 
     uint prediction_idx = 0;
+     
+    //Calculate error in prediction for forgetting factor
 
+    double pred_error = abs(feature_data.current_time.target- prediction_data_.mean_[prediction_idx]);
+    
+    double lamb = 0.97 + 0.03 / (1 + 0.01*std::exp(pred_error));
+
+    lamb =1.0;
+
+    std::cout<<"lambda: " <<lamb<<std::endl;
+    //lamb=1.0;
     // Computes mean and variance for current time
     computeMeanVariance(gp_,
                         0.0,
                         prediction_idx++,
-                        utils::getarrayFromStdVector(regression_data_model_->getRegressionData().test.input));
+                        utils::getarrayFromStdVector(regression_data_model_->getRegressionData().test.input),
+                        lamb
+                        );
 
     // Gets into future prediction only if the window size > 1
     if (gp_params_.num_predict_points_future_ > 1)

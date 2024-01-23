@@ -51,7 +51,7 @@ int main (int argc, char const *argv[])
 
   // Reset variables for Adaptive Sparse GP
   tss = 0;
-
+   double  lamb = 1.0;
   // Adaptive Sparse GP - total squared error
   for (int i = 0; i < m; ++i) {
     double x[] = {drand48() * 4 - 2, drand48() * 4 - 2};

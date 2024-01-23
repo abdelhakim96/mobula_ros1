@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 
 # File paths containing the recorded data
-file_name_gp = "recorded_data_gp_dist.txt"
-file_name_nogp2 = "recorded_data_nogp_dist.txt"
+file_name_gp = "recorded_data_agp_5.txt"
+file_name_nogp2 = "recorded_data_gp_dist_5.txt"
 
 # Lists to store the trajectory data
 ref_positions_x_gp = []
@@ -38,8 +38,8 @@ plt.figure(figsize=(12, 6))
 
 # Plot for the first trajectory (recorded_data_gp.txt)
 plt.subplot(1, 2, 1)
-plt.plot(ref_positions_x_gp, ref_positions_y_gp, label='Reference Trajectory (GP)', color='red')
-plt.plot(actual_positions_x_gp, actual_positions_y_gp, label='Actual Trajectory (GP)', color='blue')
+plt.plot(ref_positions_x_gp, ref_positions_y_gp, label='Reference Trajectory (AGP)', color='red')
+plt.plot(actual_positions_x_gp, actual_positions_y_gp, label='Actual Trajectory (AGP)', color='blue')
 plt.xlabel('X-Position')
 plt.ylabel('Y-Position')
 plt.title('Reference vs Actual Trajectory (GP)')

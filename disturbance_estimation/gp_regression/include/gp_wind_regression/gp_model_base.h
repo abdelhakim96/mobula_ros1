@@ -24,6 +24,7 @@
 #include <Eigen/Dense>
 #include "gp.h"
 #include "gp_sparse.h"
+#include "gp_asparse.h"
 #include "gp_utils.h"
 #include "rprop.h"
 #include "cg.h"
@@ -139,7 +140,11 @@ public:
     /**
      * @brief
      */
-    void computeMeanVariance(libgp::GaussianProcess*& gp, const double& mean_0, const size_t& idx, double points[]);
+    void computeMeanVariance(libgp::GaussianProcess*& gp, 
+                              const double& mean_0, 
+                             const size_t& idx, 
+                             double points[],
+                             double lamb);
 
     /**
      * @brief
