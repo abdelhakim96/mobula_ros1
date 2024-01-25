@@ -1,14 +1,13 @@
 /**
  * @file   trajectory.cpp
- * @author Hakim Amer / Mohit Mehindratta
+ * @author Hakim Amer 
  * @date   
  *  Trajectory generation node, contains 4 modes:
  1- position hold
  2- Go to setposition 
  3- Circular trajectory 
  4- Custom trajectory read from a text file 
- * @copyright
- * Copyright (C) 2022.
+
  */
 
 
@@ -40,14 +39,16 @@ void dynamicReconfigureCallback(bluerov2_trajectory::set_trajectoryConfig& confi
 
 
 // Callback for current ROV position 
-void pos_cb(const geometry_msgs::PoseStamped::ConstPtr& msg)
+void pos_cb(const nav_msgs::Odometry::ConstPtr& msg)
 {
-    current_pos = {msg->pose.position.x, msg->pose.position.y, msg->pose.position.z};
+    current_pos = {msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z};
 
     
-    current_att_quat = {msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w};
-    current_att_mat.setRotation(current_att_quat);
-    current_att_mat.getRPY(current_att[0], current_att[1], current_att[2]);
+    current_vel =  {msg->twist.twist.linear.x,
+                        msg->twist.twist.linear.y,
+                        msg->twist.twist.linear.z};
+   // current_att_mat.setRotation(current_att_quat);
+    //current_att_mat.getRPY(current_att[0], current_att[1], current_att[2]);
     
 
 }
@@ -91,7 +92,7 @@ int main(int argc, char** argv)
     
  
     // Subscribers
-    pos_sub = nh.subscribe<geometry_msgs::PoseStamped>("/mavros/mocap/position", 1, pos_cb);  // get current ROV position (ground truth)
+    pos_sub = nh.subscribe<nav_msgs::Odometry>("/mobula/rov/odometry", 1, pos_cb);  // get current ROV position (ground truth)
     traj_extern_sub = nh.subscribe<geometry_msgs::PoseStamped>("/trajectory_extern", 1, traj_extern_cb); // get desired trajectory from external source
     
 
@@ -100,7 +101,8 @@ int main(int argc, char** argv)
     ros::Rate rate(1 / sampleTime);
 
     
-
+    current_pos.resize(3);
+    current_vel.resize(3);
     while (ros::ok())
     {
 
@@ -167,9 +169,22 @@ int main(int argc, char** argv)
                ref_vel_msg.x = u_body ;
                ref_vel_msg.y = v_body;
                ref_vel_msg.z = 0.0;
-               
-               ref_yaw_msg.data = wp_yaw;
+               double yaw_to_center;
+
+             if (!current_pos.empty()) {
+                    // Calculate yaw angle to face the center of the circle
+                    double yaw_to_center = d_theta;
+
+             }
+             else{
+
+                 yaw_to_center =0.0;
+             }
+                ref_yaw_msg.data = (d_theta - M_PI)*0.0 ;
               // bool init_pos=1;
+
+              cout <<"Yaw ref"<< ref_yaw_msg.data * (180/M_PI) *0.0 <<std::endl;
+              cout <<"pos cb "<< current_pos.at(0) <<std::endl;
             }
         if (traj_type == 3)  // Read reference trajectory from a textfile
             {

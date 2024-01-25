@@ -12,7 +12,7 @@ using namespace libgp;
 
 int main (int argc, char const *argv[])
 {
-  int n=90, m=2;
+  int n=1000, m=2;
   double tss = 0, error, f, y;
   double tss1 = 0, error1, f1, y1;
   // initialize Gaussian process for 2-D input using the squared exponential 
@@ -32,7 +32,7 @@ int main (int argc, char const *argv[])
   // Add training patterns for both GPs
   for (int i = 0; i < n; ++i) {
     double x[] = {drand48() * 4 - 2, drand48() * 4 - 2};
-    y = Utils::hill(x[0], x[1]) + Utils::randn() * 0.1;
+    y = Utils::hill(x[0], x[1]) ;
     gp.add_pattern(x, y);
    // adaptive_gp.add_pattern(x, y);
   }
@@ -41,7 +41,9 @@ int main (int argc, char const *argv[])
   // Original GP - total squared error
   for (int i = 0; i < m; ++i) {
     double x[] = {drand48() * 4 - 2, drand48() * 4 - 2};
-    f = gp.f(x);
+    
+    double lamb=1;
+    f = gp.f(x, lamb);
     y = Utils::hill(x[0], x[1]);
     error = f - y;
     tss += error * error;
@@ -51,7 +53,7 @@ int main (int argc, char const *argv[])
 
   // Reset variables for Adaptive Sparse GP
   tss = 0;
-   double  lamb = 1.0;
+   double  lamb = 0.98;
   // Adaptive Sparse GP - total squared error
   for (int i = 0; i < m; ++i) {
     double x[] = {drand48() * 4 - 2, drand48() * 4 - 2};

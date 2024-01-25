@@ -75,6 +75,8 @@ public:
     // Access the velocity data from the received message
     position = {msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z};
 
+
+
     velocity = {msg->twist.twist.linear.x,
                 msg->twist.twist.linear.y,
                 msg->twist.twist.linear.z,
@@ -149,12 +151,21 @@ double Fz_dist = (m - Z_wd) * acceleration[2] - (control[2] + (control[3] + Z_wc
   
   gp_x_features_msg.data.push_back(Fx_dist);
   gp_x_features_msg.data.push_back(Fx_dist);
+  gp_x_features_msg.data.push_back(position[0]);
+  gp_x_features_msg.data.push_back(velocity[0]);
+  gp_x_features_msg.data.push_back(control[0]);
 
   gp_y_features_msg.data.push_back(Fy_dist);
   gp_y_features_msg.data.push_back(Fy_dist);
+  gp_y_features_msg.data.push_back(position[1]);
+  gp_y_features_msg.data.push_back(velocity[1]);
+  gp_y_features_msg.data.push_back(control[1]);
 
   gp_z_features_msg.data.push_back(Fz_dist);
   gp_z_features_msg.data.push_back(Fz_dist);
+  gp_z_features_msg.data.push_back(position[2]);
+  gp_z_features_msg.data.push_back(velocity[2]);
+  gp_z_features_msg.data.push_back(control[2]);
 
   // Publish the gp_features
   featureGeneratorNode.gp_x_features_pub.publish(gp_x_features_msg);

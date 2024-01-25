@@ -119,9 +119,9 @@ void GPModelTypeConcatenated::core(const FeatureDataStruct& feature_data)
 
     double pred_error = abs(feature_data.current_time.target- prediction_data_.mean_[prediction_idx]);
     
-    double lamb = 0.97 + 0.03 / (1 + 0.01*std::exp(pred_error));
+    double lamb = 0.90 + 0.1 / (1 + 0.01*std::exp(pred_error));
 
-    lamb =1.0;
+    //lamb =0.97;
 
     std::cout<<"lambda: " <<lamb<<std::endl;
     //lamb=1.0;

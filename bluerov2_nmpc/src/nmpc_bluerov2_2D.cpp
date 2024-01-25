@@ -1,10 +1,9 @@
 /**
  * @file   nmpc_bluerov2_2-D.cpp
- * @author Hakim Amer / Mohit Mehindratta  
- * @date   September 2022
+ * @author Hakim Amer 
+ * @date   Jan 2023
  *
- * @copyright
- * Copyright (C) 2022.
+
  */
 
 #include <nmpc_bluerov2_2D.h>

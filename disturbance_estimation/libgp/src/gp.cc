@@ -159,24 +159,6 @@ GaussianProcess::~GaussianProcess()
         delete cf;
 }
 
-
-double GaussianProcess::f(const double x[],  const double lamb )
-{
-
-    if (sampleset->empty())
-        return 0;
-    Eigen::Map<const Eigen::VectorXd> x_star(x, input_dim);
-    compute();
-    update_alpha(lamb);
-    update_k_star(x_star);
-    // expected_f_star = k_star'*alpha
-    return k_star.dot(alpha);
-
-
-}
-
-
-/*
 double GaussianProcess::f(const double x[],  const double lamb )
 {
     //if (sampleset->empty())
@@ -192,7 +174,7 @@ double GaussianProcess::f(const double x[],  const double lamb )
     size_t nu = sampleset->size() ;
 
     //double lamb=0.6;
-    double sigma =0.00000001;
+    double sigma =0.001;
     Eigen::MatrixXd Lambda_m = Eigen::MatrixXd::Identity(n, n);
     Lambda_m(0,0) = 1.0;  // Last element is always 1.0.
     for (int i = n - 2; i >= 0; i--) {
@@ -279,8 +261,6 @@ double GaussianProcess::f(const double x[],  const double lamb )
 
     return mu(0,0);
 }
-*/
-
 
 // Added by Mohit
 double GaussianProcess::f_noisy_inp(const double x[], Eigen::VectorXd& sx2)
@@ -459,8 +439,7 @@ void GaussianProcess::update_k_star_noisy_inp(const Eigen::VectorXd& x_star, Eig
 
 void GaussianProcess::update_alpha(double lamb)
 {
-
-
+    // can previously computed values be used?
     if (!alpha_needs_update)
         return;
     alpha_needs_update = false;
@@ -470,40 +449,7 @@ void GaussianProcess::update_alpha(double lamb)
     Eigen::Map<const Eigen::VectorXd> y(&targets[0], sampleset->size());
     int n = sampleset->size();
     // alpha = inv(L)*y
-
-
-
-
-    //implementing forgetting factor
-
-    // 0. Gamma from lambda
-
-    Eigen::MatrixXd Lambda_m = Eigen::MatrixXd::Identity(n, n);
-    Lambda_m(0,0) = 1.0;  // Last element is always 1.0.
-    for (int i = n - 2; i >= 0; i--) {
-        Lambda_m(i, i) = Lambda_m(i + 1, i + 1) * lamb;
-    }
-
-
-    // 1. L = Gamma * L;   L.topLeftCorner(n, n) = diag(Gamma) * L.topLeftCorner(n, n).triangularView<Eigen::Lower>();
-
-
-    L.topLeftCorner(n, n) =  Lambda_m * L.topLeftCorner(n, n).triangularView<Eigen::Lower>();
-
-    
-    // 2. alpha_new = Gamma * y;  alpha_new = diag(Gamma) * y;
-
-     alpha = Lambda_m * y;
-
-    // 3. alpha = inv(L)*alpha_new;  alpha = L.topLeftCorner(n, n).triangularView<Eigen::Lower>().solve(alpha_new); 
-
-    alpha = L.topLeftCorner(n, n).triangularView<Eigen::Lower>().solve(alpha); 
-
-
-
-   // alpha = L.topLeftCorner(n, n).triangularView<Eigen::Lower>().solve(y);
-
-   
+    alpha = L.topLeftCorner(n, n).triangularView<Eigen::Lower>().solve(y);
     // alpha = inv(L')*alpha
     // TO BE: check which one is correct? Top one is the original one
     L.topLeftCorner(n, n).triangularView<Eigen::Lower>().adjoint().solveInPlace(alpha);  // Seems wrong!!!

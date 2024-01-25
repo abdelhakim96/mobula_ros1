@@ -1,10 +1,8 @@
 /**
  * @file   nmpc_bluerov2_2-D_main.cpp
  * @author Mohit Mehindratta / Hakim Amer
- * @date   July 2022
+ * @date   Jan 2023
  *
- * @copyright
- * Copyright (C) 2022.
  */
 
 #include <nmpc_bluerov2_2D_main.h>
@@ -376,7 +374,7 @@ int main(int argc, char** argv)
                                       ref_velocity[0],   //u
                                       ref_velocity[1],   //v
                                       ref_velocity[2],   //w
-                                      ref_yaw_rad*(M_PI/180),
+                                      ref_yaw_rad,
                                       0.0
                              };                   
 
@@ -397,7 +395,9 @@ int main(int argc, char** argv)
             }
             std::cout << "\n";
 
-
+            
+            std::cout << "ref  yaw = "<< ref_yaw_rad << std::endl ;
+            std::cout << "current yaw = "<< angles.at(2) << std::endl ;
 
 
 

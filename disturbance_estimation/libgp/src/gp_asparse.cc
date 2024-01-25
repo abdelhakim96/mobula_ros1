@@ -274,126 +274,13 @@ namespace libgp {
 //added by hakim
 double AdaptiveSparseGaussianProcess::f(const double x[], const double lamb = 1.0)
 {   
-    /*
-  //create inducing points sample set
-     SampleSet * sampleset_indpts = new SampleSet(*sampleset);
 
-    /// compute big distance matrix to avoid re-computations
-    Eigen::MatrixXd distances = Eigen::MatrixXd::Zero(sampleset->size(), sampleset->size());
-    for(size_t i = 0; i < sampleset->size(); ++i) {
-      for(size_t j = 0; j < sampleset->size(); ++j) {
-        distances(i, j) = (sampleset->x(i) - sampleset->x(j)).norm();
-      }
-    }
-    size_t n = sampleset->size() ;
-
-       while(sampleset_indpts->size() > max_points) {
-      int k = get_most_dense_point(input_dim, sampleset_indpts->size(), distances);
-      /// sanity check
-      if (k < 0)
-          break;
-      sampleset_indpts->remove(k);
-
-      remove_column(distances, k);
-      remove_row(distances, k);
-    }
-   
-    size_t nu =  sampleset_indpts->size() ;
-  
-    Eigen::Map<const Eigen::VectorXd> x_star(x, input_dim);
-    Eigen::MatrixXd Kxx(n, n), Kuu(nu, nu), Kxu(n, nu) ,Ksu(1, nu)  ;
-
-    std::tie(Kxx, Kuu, Kxu) = compute_KmmKuuKmu(sampleset, sampleset_indpts);  //change this to calculate u sampleset
-
-    Eigen::MatrixXd I = Eigen::MatrixXd::Identity(nu, nu);
-    Eigen::MatrixXd iK_uu = Eigen::MatrixXd::Identity(nu, nu);
-    Eigen::MatrixXd L_B = Eigen::MatrixXd::Identity(nu, nu);
-    Eigen::MatrixXd B_lambda = Eigen::MatrixXd::Identity(nu, nu);
-    Eigen::MatrixXd Lambda_m = Eigen::MatrixXd::Identity(n, n);
-  
-
-
-  ////////////////////////////////
-  ////////////////////////////////
-
-    //Eigen::MatrixXd iB_lambda = Kuu + pow(sigma, -2) * (Kxu.transpose() * Lambda_m * Kxu);
-
-    
-    // compute inverses using Chelosky decomp
-    B_lambda = iB_lambda.llt().solve(I);
-    iK_uu = Kuu.llt().solve(I);
-    //update_k_star(x_star);  
-
-      for(size_t j = 0; j <= nu; ++j) {
-        (Ksu)(0, j) = cf->get(x_star, sampleset_indpts->x(j));
-      }
-    
-    const std::vector<double>& targets = sampleset->y();
-    Eigen::Map<const Eigen::VectorXd> y(&targets[0], sampleset->size());
-
-    Eigen::MatrixXd mu = pow(sigma, -2) * Ksu * B_lambda * Kxu.transpose() * Lambda_m * y;
-   
-
-
-    
-
-
-   ///////
-    //create inducing points set
-   //////
-    
-    double x_max;
-    double x_min;
-    double scale = 0.5;
-    MatrixXd U(int(sampleset->size() / scale), x_.cols()); // Initialize U
-
-    for (int i = 0; i < x_.cols(); ++i) {
-        x_max = sampleset->x.col(i).maxCoeff();
-
-        x_min = sampleset->x.col(i).minCoeff();
-        U.col(i) = Eigen::VectorXd::LinSpaced(x_.size() / scale, x_min, x_max);
-
-    }
-
-    size_t nu = sampleset->size() ;
-    
-    
-  
-    double lamb=0.97;  //make variable, forgetting!!
-    double sigma = 0.0001;
-    update_k_star(x_star);
-    Eigen::MatrixXd Lambda_m = Eigen::MatrixXd::Identity(n, n);
-    Eigen::MatrixXd Kxx = Eigen::MatrixXd::Identity(n, n);
-     Eigen::MatrixXd mu = Eigen::MatrixXd::Identity(1, 1); 
-   
-    Lambda_m(n - 1) = 1.0;  // Last element is always 1.0.
-    for (int i = n - 2; i >= 0; i--) {
-        Lambda_m(i) = Lambda_m(i + 1) * lamb;
-    }
-
-  
-    L.topLeftCorner(n, n) = L.topLeftCorner(n,
-                                            n).selfadjointView<Eigen::Lower>().llt().matrixL(); //perform Cholesky decomp
-   
-    
-    alpha = L.topLeftCorner(n, n).triangularView<Eigen::Lower>().solve(y_);  //calculate alpha  (alpha=L^T\(L\y)      Note: L^T\L = inv(K_xx)
-    L.topLeftCorner(n, n).triangularView<Eigen::Lower>().adjoint().solveInPlace(alpha);
-
-
-
-    MatrixXd mu = K_sx * alpha;
-    double cov = K_ss(0, 0) - v.dot(v);
-
-   mu = k_
-   return mu(0,0);
-
-     */
 
     size_t n = sampleset->size() ;
     size_t nu = sampleset->size() ;
 
     //double lamb=0.6;
-    double sigma =0.00000000000000000001;
+    double sigma =0.0001;
     Eigen::MatrixXd Lambda_m = Eigen::MatrixXd::Identity(n, n);
     Lambda_m(0,0) = 1.0;  // Last element is always 1.0.
     for (int i = n - 2; i >= 0; i--) {

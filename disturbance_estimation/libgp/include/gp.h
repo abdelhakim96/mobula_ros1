@@ -145,7 +145,7 @@ namespace libgp {
     
     /** Alpha is cached for performance. */ 
     Eigen::VectorXd alpha;
-    
+    Eigen::VectorXd alpha_new;
     /** Last test kernel vector. */
     Eigen::VectorXd k_star;
 
