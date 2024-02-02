@@ -9,8 +9,5 @@
     	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_z.launch"/>
     </group>
 
-        <!-- Add feature_generator node -->
-    <node name="feature_generator" pkg="your_package_name" type="your_feature_generator_executable" output="screen">
-        <!-- Add any additional parameters if required -->
-    </node>
+
 </launch>

@@ -41,6 +41,8 @@ const double Y_vc = -21.66 ; // quadratic damping coefficient  in y direction (N
 const double Z_wc = -36.99 ; // quadratic damping coefficient  in z direction (N.s^2/m^2)
 const double N_rc = -1.55  ; // quadratic damping coefficient for rotation about z direction (N.s^2/rad^2)
 
+double wind_x = 0.0;
+int count = 0;
 // Your calculations for Fx_dist, Fy_dist, Fz_dist should go here...
 
 class FeatureGeneratorNode {
@@ -57,6 +59,11 @@ public:
     acc_sub = nh.subscribe<geometry_msgs::Vector3Stamped>("/mobula/rov/acceleration", 1, &FeatureGeneratorNode::accCallback, this);
 
     nmpc_cmd_wrench_sub = nh.subscribe<geometry_msgs::Wrench>("/mobula/rov/wrench", 1, &FeatureGeneratorNode::nmpcCmdWrenchCallback, this);
+
+
+    wind_sub = nh.subscribe<geometry_msgs::Wrench>("/mobula/rov/disturbance", 1, &FeatureGeneratorNode::windCallback, this);
+
+
 
     // Subscribe to the trajectory topic
     //traj_sub = nh.subscribe<std_msgs::Float64MultiArray>("nmpc_pred_traj", 1, &FeatureGeneratorNode::trajectoryCallback, this);
@@ -95,6 +102,17 @@ public:
     acceleration = {msg->vector.x, msg->vector.y, msg->vector.z}; 
   }
 
+
+   void windCallback(const geometry_msgs::Wrench::ConstPtr& msg) {
+        
+  // Append to Y
+  wind_x = msg->force.x;
+  count = count+1;
+
+
+}
+
+
   // Process the trajectory data as needed
   // ...
 
@@ -103,6 +121,7 @@ public:
   ros::Subscriber traj_sub;
   ros::Subscriber acc_sub;
   ros::Subscriber nmpc_cmd_wrench_sub;
+  ros::Subscriber wind_sub;
   ros::Publisher gp_x_features_pub;
   ros::Publisher gp_y_features_pub;
   ros::Publisher gp_z_features_pub;
@@ -149,23 +168,37 @@ double Fz_dist = (m - Z_wd) * acceleration[2] - (control[2] + (control[3] + Z_wc
 
 
   
-  gp_x_features_msg.data.push_back(Fx_dist);
-  gp_x_features_msg.data.push_back(Fx_dist);
-  gp_x_features_msg.data.push_back(position[0]);
-  gp_x_features_msg.data.push_back(velocity[0]);
-  gp_x_features_msg.data.push_back(control[0]);
+  //gp_x_features_msg.data.push_back(Fx_dist);
+  //gp_x_features_msg.data.push_back(Fx_dist);
+  //gp_x_features_msg.data.push_back(position[0]);
+  //gp_x_features_msg.data.push_back(velocity[0]);
+ // gp_x_features_msg.data.push_back(control[0]);
 
-  gp_y_features_msg.data.push_back(Fy_dist);
-  gp_y_features_msg.data.push_back(Fy_dist);
-  gp_y_features_msg.data.push_back(position[1]);
-  gp_y_features_msg.data.push_back(velocity[1]);
-  gp_y_features_msg.data.push_back(control[1]);
 
-  gp_z_features_msg.data.push_back(Fz_dist);
-  gp_z_features_msg.data.push_back(Fz_dist);
-  gp_z_features_msg.data.push_back(position[2]);
-  gp_z_features_msg.data.push_back(velocity[2]);
-  gp_z_features_msg.data.push_back(control[2]);
+
+  //gp_y_features_msg.data.push_back(Fy_dist);
+  //gp_y_features_msg.data.push_back(Fy_dist);
+  //gp_y_features_msg.data.push_back(position[1]);
+  //gp_y_features_msg.data.push_back(velocity[1]);
+  //gp_y_features_msg.data.push_back(control[1]);
+
+  //gp_z_features_msg.data.push_back(Fz_dist);
+  //gp_z_features_msg.data.push_back(Fz_dist);
+  //gp_z_features_msg.data.push_back(position[2]);
+  //gp_z_features_msg.data.push_back(velocity[2]);
+  //gp_z_features_msg.data.push_back(control[2]);
+
+  gp_x_features_msg.data.push_back(wind_x);
+  gp_x_features_msg.data.push_back(count);
+
+  gp_y_features_msg.data.push_back(wind_x);
+  gp_y_features_msg.data.push_back(count);
+
+
+  gp_z_features_msg.data.push_back(wind_x);
+  gp_z_features_msg.data.push_back(count);
+
+
 
   // Publish the gp_features
   featureGeneratorNode.gp_x_features_pub.publish(gp_x_features_msg);

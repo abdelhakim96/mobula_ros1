@@ -89,7 +89,7 @@ struct GPParams
     int max_gradient_updates_;
 
     double mean_t0_, variance_t0_;
-
+    double lambda_;
     //Eigen::VectorXd inputs_noise_variance_;
 };
 
@@ -101,6 +101,7 @@ struct RunParams
     GPDirectionType gp_direction_type_;
     int filter_window_;
     double mass_;
+    double lambda_;
 };
 
 }  // namespace wind_regression

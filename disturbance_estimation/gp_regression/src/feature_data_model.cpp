@@ -128,6 +128,9 @@ bool FeatureDataModel::setFeatureData(const InputTargetDataStruct& input_target_
         {
             std::cout
                 << "**FeatureDataModelERROR: Subscribed input_target_data is of incorrect size for feature_data !\n";
+       
+            std::cout << "input size is: "<<input_target_data.input.size()<< std::endl;
+
         }
         return 0;
     }
@@ -202,11 +205,14 @@ bool FeatureDataModel::setFeatureData(const MeasDataStruct& measurement_data)
             ? (uint)gp_params_.input_data_params_.num_features_ / 2
             : gp_params_.input_data_params_.num_features_;
 
+
+
     if (not is_input_of_correct_size)
     {
         if (run_params_.debug_flag_ >= 0)
         {
             std::cout << "**FeatureDataModelERROR: Generated feature_data_input is of incorrect size!\n";
+            //std::cout << "feature_data_input size is: "<<feature_data_.current_time.input.size()<< std::endl;
         }
         return 0;
     }

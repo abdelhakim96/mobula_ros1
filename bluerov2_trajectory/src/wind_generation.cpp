@@ -15,12 +15,11 @@
 #include <dynamic_reconfigure/server.h>
 #include <bluerov2_trajectory/set_wind_generationConfig.h>
 #include "geometry_msgs/Twist.h"
-#include <bluerov2_trajectory/CurrentDist.h>
 
 using namespace std;
 using namespace Eigen;
 
-double sampleTime = 0.01;
+double sampleTime = 0.001;
 bool wind_start, noise_on;
 Vector3d wind_component;
 int wind_type, noise_type;

@@ -111,8 +111,12 @@ void GPWindRegressionNode::initLaunchParameters(ros::NodeHandle& nh)
     gp_params_.num_window_points_past_ = num_window_points_past;
     gp_params_.num_predict_points_future_ = num_predict_points_future;
     nh.param<double>(run_params_.ros_namespace_ + "/rec_rate_factor", gp_params_.rec_rate_factor_, 0.7);
-    nh.param<double>(
-        run_params_.ros_namespace_ + "/sizefactor_sparse_gp_initial", gp_params_.sizefactor_sparse_gp_initial_, 1.0);
+    nh.param<double>(run_params_.ros_namespace_ + "/sizefactor_sparse_gp_initial", gp_params_.sizefactor_sparse_gp_initial_, 1.0);
+
+    
+    nh.param<double>(run_params_.ros_namespace_ + "/lambda", gp_params_.lambda_, 1.0);
+    //gp_params_.lambda_ = lambda;
+
     if (gp_params_.sizefactor_sparse_gp_initial_ > 1)
     {
         if (run_params_.debug_flag_ >= 0)
