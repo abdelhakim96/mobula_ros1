@@ -22,8 +22,8 @@
     <param name="use_model_difference" type="bool" value="false" /> <!-- Paramter to specify whether to use model difference values in feature data.-->
     <param name="use_states" type="bool" value="false" /> <!-- Paramter to specify whether to use state values in feature data.-->
     <param name="use_controls" type="bool" value="false" /> <!-- Paramter to specify whether to use control values in feature data.-->
-    <param name="num_features" type="int" value="1" /> <!-- Paramter to set number of features. Note that this parameter is only for feature_data_model_type = 0, otherwise, it is calculated.-->
-    <param name="data_history" type="int" value="1" /> <!-- Paramter to set input data history.-->
+    <param name="num_features" type="int" value="4" /> <!-- Paramter to set number of features. Note that this parameter is only for feature_data_model_type = 0, otherwise, it is calculated.-->
+    <param name="data_history" type="int" value="5" /> <!-- Paramter to set input data history.-->
 
     <param name="sf_t0" type="double" value="1.0" /> <!-- Paramter to set sf_t0. -->
     <param name="sn_t0" type="double" value="1.0" /> <!-- Paramter to set sn_t0. -->

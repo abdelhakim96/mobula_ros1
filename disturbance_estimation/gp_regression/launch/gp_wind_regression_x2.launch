@@ -7,7 +7,7 @@
 	<param name="variance_pub_topic" type="string" value="/gp_disturb_reg/var/x2" /> <!-- Parameter to specfy topic name for variance.-->
 	<param name="mean_p_2std_dev_pub_topic" type="string" value="/gp_disturb_reg/mu_p_2std_dev/x2" /> <!-- Parameter to specfy topic name for mean_p_2std_dev_pub_topic.-->
 	<param name="mean_m_2std_dev_pub_topic" type="string" value="/gp_disturb_reg/mu_m_2std_dev/x2" /> <!-- Parameter to specfy topic name for mean_m_2std_dev_pub_topic.-->
-        <param name="feature_data_sub_topic" type="string" value="/dev/gp/feature_x2_filtered" /> <!-- Parameter to specfy topic name for GP feature data. -->
+        <param name="feature_data_sub_topic" type="string" value="/dev/gp/feature_x_filtered" /> <!-- Parameter to specfy topic name for GP feature data. -->
 	<param name="file_gp_initial" type="string" value="gp_initial_x2.dat" /> <!-- Parameter to specfy file name for gp_initial.-->
 	<param name="create_new_gp_initial" type="bool" value="true" /> <!-- Paramter to specify whether to create new gp_initial.-->
 	<param name="use_gp_initial" type="bool" value="true" /> <!-- Paramter to use LSTM feature by utilizing gp_initial.-->

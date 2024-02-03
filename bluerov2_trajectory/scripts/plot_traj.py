@@ -1,12 +1,12 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-folder_name = "24-1"
+folder_name = "3-2"
 
 # File paths containing the recorded data
 file_name_gp_fixed_l = os.path.join(folder_name, "recorded_data_gp_lambda_0.97.txt")
 file_name_agp = os.path.join(folder_name, "recorded_data_agp.txt")
-file_name_nogp = os.path.join(folder_name, "recorded_data_nogp.txt")
+file_name_nogp = os.path.join(folder_name, "mhe_3W.txt")
 
 # Lists to store the trajectory data
 ref_positions_x_gp = []
@@ -64,7 +64,7 @@ plt.plot(actual_positions_x_agp[:subset_size], actual_positions_y_agp[:subset_si
 
 # Plot for no_gp
 plt.plot(ref_positions_x_nogp[:subset_size], ref_positions_y_nogp[:subset_size], label='Reference Trajectory', color='red', linestyle='--')
-plt.plot(actual_positions_x_nogp[:subset_size], actual_positions_y_nogp[:subset_size], label=' (No GP)', color='green')
+plt.plot(actual_positions_x_nogp[:subset_size], actual_positions_y_nogp[:subset_size], label=' MHE', color='green')
 
 plt.xlabel('X-Position')
 plt.ylabel('Y-Position')
@@ -90,7 +90,7 @@ error_nogp = np.sqrt((np.array(actual_positions_x_nogp[:1000]) - np.array(ref_po
 # Plotting the absolute error against time
 plt.plot(range(len(error_gp)), error_gp, label=' (GP Fixed Lambda)', color='blue')
 plt.plot(range(len(error_agp)), error_agp, label=' (Adaptive GP)', color='orange')
-plt.plot(range(len(error_nogp)), error_nogp, label='(No GP)', color='green')
+plt.plot(range(len(error_nogp)), error_nogp, label='MHE', color='green')
 
 plt.xlabel('Time Step')
 plt.ylabel('Absolute Error')

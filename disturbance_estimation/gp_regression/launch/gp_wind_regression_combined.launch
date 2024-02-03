@@ -1,13 +1,33 @@
 <launch>
-    <group ns="gp_wind_regression_x">
-    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_x.launch"/>
+    <group ns="gp_wind_regression_x1">
+    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_x1.launch"/>
     </group>
-    <group ns="gp_wind_regression_y">
-    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_y.launch"/>
+    <group ns="gp_wind_regression_x2">
+    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_x2.launch"/>
     </group>
-    <group ns="gp_wind_regression_z">
-    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_z.launch"/>
+    <group ns="gp_wind_regression_x3">
+    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_x3.launch"/>
     </group>
 
+
+    <group ns="gp_wind_regression_y1">
+    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_y1.launch"/>
+    </group>
+    <group ns="gp_wind_regression_y2">
+    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_y2.launch"/>
+    </group>
+    <group ns="gp_wind_regression_y3">
+    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_y3.launch"/>
+    </group>
+
+        <group ns="gp_wind_regression_z1">
+    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_z1.launch"/>
+    </group>
+    <group ns="gp_wind_regression_z2">
+    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_z2.launch"/>
+    </group>
+    <group ns="gp_wind_regression_z3">
+    	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_z3.launch"/>
+    </group>
 
 </launch>
