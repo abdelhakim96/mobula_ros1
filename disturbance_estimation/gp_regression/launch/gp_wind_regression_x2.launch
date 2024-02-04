@@ -1,7 +1,7 @@
 <launch>
   	   <node pkg="gp_wind_regression" type="gp_wind_regression" name="gp_wind_regression_x2" output="screen" />
 
-	<param name="switch_xyz" type="int" value="1" /> <!-- Paramter to switch the regression between x,y,z. x=0, y=1, z=2.-->
+	<param name="switch_xyz" type="int" value="0" /> <!-- Paramter to switch the regression between x,y,z. x=0, y=1, z=2.-->
 	<param name="prediction_init_pub_topic" type="string" value="/gp_disturb_reg/predInit/x2" /> <!-- Parameter to specfy topic name for for predInit.-->
 	<param name="mean_pub_topic" type="string" value="/gp_disturb_reg/mu/x2" /> <!-- Parameter to specfy topic name for mean.-->
 	<param name="variance_pub_topic" type="string" value="/gp_disturb_reg/var/x2" /> <!-- Parameter to specfy topic name for variance.-->
@@ -13,7 +13,7 @@
 	<param name="use_gp_initial" type="bool" value="true" /> <!-- Paramter to use LSTM feature by utilizing gp_initial.-->
 	<param name="use_sparse_gp_initial" type="bool" value="false" /> <!-- Paramter to use sparse_gp_initial.-->
 	<param name="sizefactor_sparse_gp_initial" type="double" value="0.7" /> <!-- Paramter to set sizefactor for sparse_gp_initial.-->
-	<param name="lambda" type="double" value="1.0" /> <!-- Paramter to set sizefactor for sparse_gp_initial.-->
+	<param name="lambda" type="double" value="0.7" /> <!-- Paramter to set sizefactor for sparse_gp_initial.-->
 	<!-- Load commmon parameters. -->
 	<include file="$(find gp_wind_regression)/launch/common_params.xml" />
 

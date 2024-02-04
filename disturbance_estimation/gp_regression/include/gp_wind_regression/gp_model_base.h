@@ -24,7 +24,7 @@
 #include <Eigen/Dense>
 #include "gp.h"
 #include "gp_sparse.h"
-#include "gp_asparse.h"
+//#include "gp_asparse.h"
 #include "gp_utils.h"
 #include "rprop.h"
 #include "cg.h"

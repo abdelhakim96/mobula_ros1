@@ -1,4 +1,11 @@
 <launch>
+
+
+<node name="feature_generator" pkg="gp_wind_regression" type="feature_generator" output="screen">
+    <!-- Add any additional parameters or arguments here if needed -->
+</node>
+
+
     <group ns="gp_wind_regression_x1">
     	<include file="$(find gp_wind_regression)/launch/gp_wind_regression_x1.launch"/>
     </group>
