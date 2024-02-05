@@ -14,7 +14,7 @@
 
 #include <trajectory.h>   // Adding header file: contains all variable types definitions and subscribers/publishers 
 #include <bluerov2_trajectory/set_trajectoryConfig.h>
-double sampleTime = 0.01; 
+double sampleTime = 0.005; 
 // Callback functions
 //dynamicReconfigureCallback Retreives all the data from rqt_reconfigure GUI 
 
