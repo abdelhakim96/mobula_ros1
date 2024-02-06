@@ -7,6 +7,31 @@
  * Copyright (C) 2021.
  */
 
+
+const double f_s = 1.0;    //scaling factor;
+const double m = 11.5;    // BlueROV2 mass (kg)  
+const double g = 9.81;  // gravitational field strength (m/s^2)
+const double F_bouy = 114.8; // Buoyancy force (N)
+
+const double X_ud = -5.5 ; // Added mass in x direction (kg)
+const double Y_vd = -12.7 ; // Added mass in y direction (kg)
+const double Z_wd = -14.57 ; // Added mass in z direction (kg)
+const double N_rd = -0.12 ; // Added mass for rotation about z direction (kg)
+
+const double I_xx = 0.16 ; // Moment of inertia (kg.m^2)
+const double I_yy = 0.16 ; // Moment of inertia (kg.m^2)
+const double I_zz = 0.16 ; // Moment of inertia (kg.m^2)
+
+const double X_u = -4.03 ; // Linear damping coefficient in x direction (N.s/m)
+const double Y_v  = -6.22 ; // Linear damping coefficient  in y direction (N.s/m)
+const double Z_w = -5.18; // Linear damping coefficient  in z direction (N.s/m)
+const double N_r = -0.07 ;  // Linear damping coefficient for rotation about z direction (N.s/rad)
+
+const double X_uc = -18.18 ; // quadratic damping coefficient in x direction (N.s^2/m^2)
+const double Y_vc = -21.66 ; // quadratic damping coefficient  in y direction (N.s^2/m^2)
+const double Z_wc = -36.99 ; // quadratic damping coefficient  in z direction (N.s^2/m^2)
+const double N_rc = -1.55  ; // quadratic damping coefficient for rotation about z direction (N.s^2/rad^2)
+
 #include <gp_wind_regression/feature_data_model.h>
 
 namespace wind_regression
@@ -34,12 +59,25 @@ FeatureDataModel::~FeatureDataModel()
 }
 
 void FeatureDataModel::computeModelDifference(const MeasDataStruct& previous_data, const MeasDataStruct& current_data)
-{
+{   
+
+    //double Fx_dist = (m - X_ud) * acceleration[0] - (control[0] + (m * velocity[1] + Y_vd * velocity[1]) * velocity[5] + (X_u + X_uc * sqrt(velocity[0] * velocity[0])) * velocity[0]);
+
     model_difference_values.x =
-        current_data.acceleration_struct.linear[0] -
-        previous_data.twist_struct.angular_velocity[2] * previous_data.twist_struct.linear_velocity[1] +
-        previous_data.twist_struct.angular_velocity[1] * previous_data.twist_struct.linear_velocity[2] -
-        GRAVITATIONAL_CONST * sin(previous_data.nmpc_struct.cmd_attitude[1]);
+       current_data.acceleration_struct.linear[0] -
+       previous_data.twist_struct.angular_velocity[2] * previous_data.twist_struct.linear_velocity[1] +
+       previous_data.twist_struct.angular_velocity[1] * previous_data.twist_struct.linear_velocity[2] -
+       GRAVITATIONAL_CONST * sin(previous_data.nmpc_struct.cmd_attitude[1]);
+   
+   
+    //(m - X_ud) *  current_data.acceleration_struct.linear[0] - 
+   // (previous_data.nmpc_struct.cmd_attitude[0] +
+   //  (m *  previous_data.twist_struct.linear_velocity[1] + Y_vd *  previous_data.twist_struct.linear_velocity[1]) * velocity[5] + 
+   //  (X_u + X_uc * sqrt( previous_data.twist_struct.linear_velocity[0]* previous_data.twist_struct.linear_velocity[0])) * previous_data.twist_struct.linear_velocity[0]);
+
+
+
+
 
     model_difference_values.y =
         current_data.acceleration_struct.linear[1] -

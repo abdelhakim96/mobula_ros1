@@ -420,7 +420,8 @@ void GaussianProcess::update_alpha(const double& lambda)
     Eigen::MatrixXd Gamma = Eigen::MatrixXd::Identity(n, n);
     for (int i = n - 2; i >= 0; i--)
     {
-        Gamma(i, i) = Gamma(i + 1, i + 1) * lambda;
+       // Gamma(i, i) = Gamma(i + 1, i + 1) * lambda;
+       Gamma(i, i) = Gamma(i + 1, i + 1) * std::sqrt(lambda);
     }
     // target values updated with forgetting factor
     Eigen::VectorXd y_updated = Gamma * y;

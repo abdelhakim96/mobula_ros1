@@ -4,15 +4,15 @@ import numpy as np
 
 plt.close('all')
 
-folder_name = "5-2/dense"
+folder_name = ""
 
 # File paths containing the recorded data
 file_name_gp_nogp = os.path.join(folder_name, "nogp.txt")
 file_name_gp_lambda01 = os.path.join(folder_name, "lambda1.txt")
 file_name_gp_lambda08 = os.path.join(folder_name, "lambda08.txt")
 file_name_gp_lambda09 = os.path.join(folder_name, "lambda09.txt")
-file_name_macgp = os.path.join(folder_name, "macgp.txt")
-file_name_newest = os.path.join(folder_name, "recorded_data_brov.txt")  # Added line for newest.txt
+file_name_macgp = os.path.join(folder_name, "macgp_new.txt")
+file_name_newest = os.path.join(folder_name, "newest.txt")  # Added line for newest.txt
 
 # Lists to store the trajectory data
 ref_positions_x_gp_nogp = []
@@ -78,7 +78,7 @@ print("macgp Data:", len(actual_positions_x_macgp))
 print("newest Data:", len(actual_positions_x_newest))  # Added line for newest.txt
 
 # Plotting a subset of 650 points from each trajectory
-subset_size = 600
+subset_size = 1300
 
 plt.figure(figsize=(10, 6))
 
@@ -86,16 +86,16 @@ plt.figure(figsize=(10, 6))
 plt.plot(actual_positions_x_gp_nogp[:subset_size], actual_positions_y_gp_nogp[:subset_size], linewidth=2, label='GP_nogp', color='blue')
 
 # Plot for lambda01
-#plt.plot(actual_positions_x_gp_lambda01[:subset_size], actual_positions_y_gp_lambda01[:subset_size], linewidth=2, label='lambda01', color='orange')
+plt.plot(actual_positions_x_gp_lambda01[:subset_size], actual_positions_y_gp_lambda01[:subset_size], linewidth=2, label='lambda01', color='orange')
 
 # Plot for lambda08
-#plt.plot(actual_positions_x_gp_lambda08[:subset_size], actual_positions_y_gp_lambda08[:subset_size], linewidth=2, label='lambda08', color='green')
+plt.plot(actual_positions_x_gp_lambda08[:subset_size], actual_positions_y_gp_lambda08[:subset_size], linewidth=2, label='lambda08', color='green')
 
 # Plot for lambda09
 #plt.plot(actual_positions_x_gp_lambda09[:subset_size], actual_positions_y_gp_lambda09[:subset_size], linewidth=2, label='lambda09', color='red')
 
 # Plot for macgp
-plt.plot(actual_positions_x_macgp[:subset_size], actual_positions_y_macgp[:subset_size], linewidth=2, label='macgp', color='green')
+plt.plot(actual_positions_x_macgp[:subset_size], actual_positions_y_macgp[:subset_size], linewidth=2, label='macgp', color='red')
 
 # Plot for newest.txt
 plt.plot(actual_positions_x_newest[:subset_size], actual_positions_y_newest[:subset_size], linewidth=2, label='newest', color='brown')  # Added line for newest.txt

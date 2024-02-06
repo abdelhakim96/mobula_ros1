@@ -1,7 +1,7 @@
 <launch>
   	   <node pkg="gp_wind_regression" type="gp_wind_regression" name="gp_wind_regression_z2" output="screen" />
 
-	<param name="switch_xyz" type="int" value="1" /> <!-- Paramter to switch the regression between x,y,z. x=0, y=1, z=2.-->
+	<param name="switch_xyz" type="int" value="2" /> <!-- Paramter to switch the regression between x,y,z. x=0, y=1, z=2.-->
 	<param name="prediction_init_pub_topic" type="string" value="/gp_disturb_reg/predInit/z2" /> <!-- Parameter to specfy topic name for for predInit.-->
 	<param name="mean_pub_topic" type="string" value="/gp_disturb_reg/mu/z2" /> <!-- Parameter to specfy topic name for mean.-->
 	<param name="variance_pub_topic" type="string" value="/gp_disturb_reg/var/z2" /> <!-- Parameter to specfy topic name for variance.-->
