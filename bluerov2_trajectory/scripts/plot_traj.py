@@ -10,7 +10,7 @@ folder_name = "5-2/dense"
 file_name_gp_nogp = os.path.join(folder_name, "nogp.txt")
 file_name_gp_lambda01 = os.path.join(folder_name, "lambda1.txt")
 file_name_gp_lambda08 = os.path.join(folder_name, "lambda08.txt")
-file_name_gp_lambda09 = os.path.join(folder_name, "lambda09.txt")
+file_name_gp_lambda09 = os.path.join(folder_name, "lambda.txt")
 file_name_macgp = os.path.join(folder_name, "macgp.txt")
 file_name_newest = os.path.join(folder_name, "recorded_data_brov.txt")  # Added line for newest.txt
 
@@ -78,7 +78,7 @@ print("macgp Data:", len(actual_positions_x_macgp))
 print("newest Data:", len(actual_positions_x_newest))  # Added line for newest.txt
 
 # Plotting a subset of 650 points from each trajectory
-subset_size = 600
+subset_size = 800
 
 plt.figure(figsize=(10, 6))
 
@@ -86,19 +86,19 @@ plt.figure(figsize=(10, 6))
 plt.plot(actual_positions_x_gp_nogp[:subset_size], actual_positions_y_gp_nogp[:subset_size], linewidth=2, label='GP_nogp', color='blue')
 
 # Plot for lambda01
-#plt.plot(actual_positions_x_gp_lambda01[:subset_size], actual_positions_y_gp_lambda01[:subset_size], linewidth=2, label='lambda01', color='orange')
+plt.plot(actual_positions_x_gp_lambda01[:subset_size], actual_positions_y_gp_lambda01[:subset_size], linewidth=2, label='lambda01', color='orange')
 
 # Plot for lambda08
 #plt.plot(actual_positions_x_gp_lambda08[:subset_size], actual_positions_y_gp_lambda08[:subset_size], linewidth=2, label='lambda08', color='green')
 
 # Plot for lambda09
-#plt.plot(actual_positions_x_gp_lambda09[:subset_size], actual_positions_y_gp_lambda09[:subset_size], linewidth=2, label='lambda09', color='red')
+plt.plot(actual_positions_x_gp_lambda09[:subset_size], actual_positions_y_gp_lambda09[:subset_size], linewidth=2, label='lambda09', color='black')
 
 # Plot for macgp
 plt.plot(actual_positions_x_macgp[:subset_size], actual_positions_y_macgp[:subset_size], linewidth=2, label='macgp', color='green')
 
 # Plot for newest.txt
-plt.plot(actual_positions_x_newest[:subset_size], actual_positions_y_newest[:subset_size], linewidth=2, label='newest', color='brown')  # Added line for newest.txt
+#plt.plot(actual_positions_x_newest[:subset_size], actual_positions_y_newest[:subset_size], linewidth=2, label='newest', color='brown')  # Added line for newest.txt
 
 # Plot for the unit circle (Reference)
 theta = np.linspace(0, 2*np.pi, 100)
@@ -140,7 +140,7 @@ mean_error_newest = np.mean(error_newest)
 plt.plot(range(len(error_gp_nogp)), error_gp_nogp, label=f'GP_nogp (Mean Error: {mean_error_gp_nogp:.2f})', color='blue')
 plt.plot(range(len(error_gp_lambda01)), error_gp_lambda01, label=f'lambda01 (Mean Error: {mean_error_gp_lambda01:.2f})', color='orange')
 plt.plot(range(len(error_gp_lambda08)), error_gp_lambda08, label=f'lambda08 (Mean Error: {mean_error_gp_lambda08:.2f})', color='green')
-plt.plot(range(len(error_gp_lambda09)), error_gp_lambda09, label=f'lambda09 (Mean Error: {mean_error_gp_lambda09:.2f})', color='red')
+plt.plot(range(len(error_gp_lambda09)), error_gp_lambda09, label=f'lambda09 (Mean Error: {mean_error_gp_lambda09:.2f})', color='cyan')
 plt.plot(range(len(error_macgp)), error_macgp, label=f'macgp (Mean Error: {mean_error_macgp:.2f})', color='purple')
 plt.plot(range(len(error_newest)), error_newest,  linestyle='--', linewidth=2, label=f'newest (Mean Error: {mean_error_newest:.2f})', color='brown')
 

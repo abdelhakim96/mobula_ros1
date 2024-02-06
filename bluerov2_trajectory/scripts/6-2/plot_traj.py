@@ -78,7 +78,7 @@ print("macgp Data:", len(actual_positions_x_macgp))
 print("newest Data:", len(actual_positions_x_newest))  # Added line for newest.txt
 
 # Plotting a subset of 650 points from each trajectory
-subset_size = 1300
+subset_size = 650
 
 plt.figure(figsize=(10, 6))
 
@@ -92,7 +92,7 @@ plt.plot(actual_positions_x_gp_lambda01[:subset_size], actual_positions_y_gp_lam
 plt.plot(actual_positions_x_gp_lambda08[:subset_size], actual_positions_y_gp_lambda08[:subset_size], linewidth=2, label='lambda08', color='green')
 
 # Plot for lambda09
-#plt.plot(actual_positions_x_gp_lambda09[:subset_size], actual_positions_y_gp_lambda09[:subset_size], linewidth=2, label='lambda09', color='red')
+plt.plot(actual_positions_x_gp_lambda09[:subset_size], actual_positions_y_gp_lambda09[:subset_size], linewidth=2, label='lambda09', color='green')
 
 # Plot for macgp
 plt.plot(actual_positions_x_macgp[:subset_size], actual_positions_y_macgp[:subset_size], linewidth=2, label='macgp', color='red')

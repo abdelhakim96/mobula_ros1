@@ -46,6 +46,15 @@ void dynamicReconfigureCallback(bluerov2_trajectory::set_wind_generationConfig& 
     noise_time_period = config.noise_time_period;
 }
 
+
+
+
+
+
+
+
+
+
 std_msgs::Bool trajectory_start_flag;
 
 void trajectory_start_cb(const std_msgs::Bool::ConstPtr& msg)
@@ -206,28 +215,53 @@ int main(int argc, char** argv)
                 break;
                 //hakim edit
             case 4: // Wind Farm 
-                if (print_flag_sinus_comb3 == 1)
-                {
-                    t_last = ros::Time::now().toSec();
-                    t_loop = t - t_last;
+      if (print_flag_sinus_comb3 == 1)
+    {
+        t_last = ros::Time::now().toSec();
+        t_loop = t - t_last;
 
-                    ROS_INFO("--------Wind Farm wind force selected!--------");
-                    print_flag_traj_start = 1;
-                    print_flag_wind_start = 1;
-                    print_flag_const = 1;
-                    print_flag_sinus = 1;
-                    print_flag_sinus_comb1 = 1;
-                    print_flag_sinus_comb2 = 1;
-                    print_flag_sinus_comb3 = 0;
-                    print_flag_windfarm = 0;
-                }
+        ROS_INFO("--------Wind Farm wind force selected!--------");
+        print_flag_traj_start = 1;
+        print_flag_wind_start = 1;
+        print_flag_const = 1;
+        print_flag_sinus = 1;
+        print_flag_sinus_comb1 = 1;
+        print_flag_sinus_comb2 = 1;
+        print_flag_sinus_comb3 = 0;
+        print_flag_windfarm = 0;
+    }
 
-                // Set wind magnitude based on input wind speed
-                wind_magnitude = { ws_x, ws_y, 0 };
-                break;
+    // Set wind magnitude based on input wind speed
+    //wind_magnitude = { ws_x, ws_y, 0 };
 
-            default:
-                break;
+    // Calculate time elapsed since the last update
+    t_loop = ros::Time::now().toSec() - t_last;
+
+    // Define the duration of each phase of the wind pattern
+    double phase_duration = wind_time_period / 4.0;
+
+    // Calculate wind force based on the current phase of the pattern
+    if (t_loop < phase_duration) {
+        // Linearly increasing phase
+        wind_magnitude = wind_component.array() * (2*t_loop / phase_duration);
+    } else if (t_loop < 2 * phase_duration) {
+        // Sine wave phase
+        wind_magnitude = wind_component.array() * (mean_wind_force);
+    } else if (t_loop < 3 * phase_duration) {
+        // Step function phase
+       wind_magnitude = wind_component.array() * (mean_wind_force + max_wind_force * sin(12 * M_PI * (t_loop - phase_duration) / phase_duration));
+
+    } else if (t_loop < 4 * phase_duration) {
+        // Linearly decreasing phase
+        wind_magnitude = wind_component.array() * (mean_wind_force - mean_wind_force * ((t_loop - 3 * phase_duration) / phase_duration));
+    } else {
+        // Restart the pattern
+        t_last = ros::Time::now().toSec();
+    }
+    break;
+
+     //       default:
+       //         break;
             }
 
             if (noise_on)
