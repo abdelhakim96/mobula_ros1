@@ -1,12 +1,15 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Vector3.h>
+
+#include <geometry_msgs/Wrench.h>
+
 #include <std_msgs/Float64.h>
 #include <std_msgs/Float64MultiArray.h> // Added this line for Float64MultiArray
 #include <nav_msgs/Odometry.h>
 #include <fstream>
 #include <string>
 
-std::string file_name = "recorded_data_brov.txt";
+std::string file_name = "/home/hakim/catkin_ws/src/mobula_ros1/bluerov2_trajectory/test_recordings/recorded_data_brov.txt";
 std::ofstream print_results;
 
 geometry_msgs::Vector3 ref_position;
@@ -17,6 +20,10 @@ std_msgs::Float64 W1_opt_y;
 std_msgs::Float64 W2_opt_y;
 std_msgs::Float64 W3_opt_y;
 std_msgs::Float64MultiArray mu_y; // Added for Float64MultiArray
+std_msgs::Float64MultiArray mu_x; // Modified from Float64MultiArray to Vector3
+geometry_msgs::Wrench disturbance;
+
+bool is_mu_y_received = false; // Flag to indicate whether mu_y data is received
 
 void ref_position_cb(const geometry_msgs::Vector3::ConstPtr& msg) {
     ref_position = *msg;
@@ -24,6 +31,10 @@ void ref_position_cb(const geometry_msgs::Vector3::ConstPtr& msg) {
 
 void ref_velocity_cb(const geometry_msgs::Vector3::ConstPtr& msg) {
     ref_velocity = *msg;
+}
+
+void disturbance_cb(const geometry_msgs::Wrench::ConstPtr& msg) {
+    disturbance = *msg;
 }
 
 void ref_yaw_cb(const std_msgs::Float64::ConstPtr& msg) {
@@ -48,9 +59,17 @@ void W3_cb(const std_msgs::Float64::ConstPtr& msg) {
 
 void mu_y_cb(const std_msgs::Float64MultiArray::ConstPtr& msg) {
     mu_y = *msg;
+    is_mu_y_received = !mu_y.data.empty(); // Set the flag based on whether mu_y data is empty or not
+}
+
+void mu_x_cb(const std_msgs::Float64MultiArray::ConstPtr& msg) {
+    mu_x = *msg;
 }
 
 void write_data_to_file(const ros::TimerEvent& event) {
+    if (!is_mu_y_received || mu_y.data.empty()) // If mu_y data is not received yet or is empty, return without writing to file
+        return;
+
     print_results.open(file_name.c_str(), std::ios_base::app);
 
     double position_error_x = rov_odometry.pose.pose.position.x - ref_position.x;
@@ -73,6 +92,8 @@ void write_data_to_file(const ros::TimerEvent& event) {
     print_results << rov_odometry.pose.pose.orientation.z << ",";
 
     print_results << W1_opt_y.data << "," << W2_opt_y.data << "," << W3_opt_y.data << ",";
+
+    print_results << disturbance.force.x << "," <<  disturbance.force.y << "," << disturbance.force.z << ",";
 
     // Assuming the Float64MultiArray data is a 1D array
     for (size_t i = 0; i < mu_y.data.size(); ++i) {
@@ -105,6 +126,9 @@ int main(int argc, char** argv) {
     ros::Subscriber W2_sub = nh.subscribe<std_msgs::Float64>("/W2_opt_y", 1, W2_cb);
     ros::Subscriber W3_sub = nh.subscribe<std_msgs::Float64>("/W3_opt_y", 1, W3_cb);
     ros::Subscriber mu_y_sub = nh.subscribe<std_msgs::Float64MultiArray>("/gp_disturb_reg/mu/y", 1, mu_y_cb);
+  
+    ros::Subscriber mu_x_sub = nh.subscribe<std_msgs::Float64MultiArray>("/gp_disturb_reg/mu/x", 1, mu_x_cb);
+    ros::Subscriber disturbance_sub = nh.subscribe<geometry_msgs::Wrench>("/mobula/rov/disturbance", 1, disturbance_cb);
 
     ros::Timer timer = nh.createTimer(ros::Duration(0.1), write_data_to_file);
 

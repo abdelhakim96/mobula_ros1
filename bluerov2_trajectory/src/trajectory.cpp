@@ -144,15 +144,15 @@ int main(int argc, char** argv)
         if (traj_type == 2)  // Circlular trajectory with specified radius,centre and velocity
             {
                ROS_INFO("--------Circle selected!--------");
-               d_theta =  (absvel * sampleTime * radius + d_theta)/10;
+               d_theta =  (absvel * sampleTime * radius + d_theta);
                double d_theta_2 = 2 * absvel * sampleTime * radius + d_theta;
 
-               ref_traj_msg.x = wp_x - radius * cos (d_theta);
+               ref_traj_msg.x = radius + wp_x - radius * cos (d_theta);
                ref_traj_msg.y = wp_x + radius * sin (d_theta);
                ref_traj_msg.z = wp_z;      
                
 
-               double p_x1 = wp_x - radius * cos (d_theta);
+               double p_x1 =  wp_x - radius * cos (d_theta);
                double p_x2 = wp_x - radius * cos (d_theta_2);
 
                double p_y1 = wp_x - radius * sin (d_theta);
@@ -167,7 +167,7 @@ int main(int argc, char** argv)
 
            
                ref_vel_msg.x = u_body ;
-               ref_vel_msg.y = v_body;
+               ref_vel_msg.y = -v_body;
                ref_vel_msg.z = 0.0;
                double yaw_to_center;
 
