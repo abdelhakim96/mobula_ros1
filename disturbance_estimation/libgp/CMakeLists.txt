@@ -24,8 +24,8 @@ IF(USAGE_IN_ROS_BRIDGE)
     OPTION(BUILD_TESTS "Build tests" OFF)
     OPTION(BUILD_EXAMPLES "Build examples" OFF)
 ELSE()
-    OPTION(BUILD_TESTS "Build tests" OFF)
-    OPTION(BUILD_EXAMPLES "Build examples" OFF)
+    OPTION(BUILD_TESTS "Build tests" ON)
+    OPTION(BUILD_EXAMPLES "Build examples" ON)
 ENDIF()
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_MODULE_PATH})
@@ -64,7 +64,6 @@ ENDIF()
 IF(BUILD_EXAMPLES)
   ADD_SUBDIRECTORY(examples)
 ENDIF()
-
 
 
 # ----- Install -----

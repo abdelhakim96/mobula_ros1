@@ -422,10 +422,12 @@ int main(int argc, char** argv)
            online_data.distFz = dist_Fx.data_zeros;
 
 
-          ROS_ERROR_STREAM("online_data = " << online_data.distFx[0] << " (sec)");
-          ROS_ERROR_STREAM("online_data = " << online_data.distFy[0] << " (sec)");
-          ROS_ERROR_STREAM("online_data = " << online_data.distFz[0] << " (sec)");
-
+       //   ROS_ERROR_STREAM("online_data = " << online_data.distFx[0] << " (sec)");
+       //   ROS_ERROR_STREAM("online_data = " << online_data.distFy[0] << " (sec)");
+        //  ROS_ERROR_STREAM("online_data = " << online_data.distFz[0] << " (sec)");
+          std::cout << "\033[1;31m" << "online_data = " << online_data.distFx[0] << " (sec)" << "\033[0m" << std::endl;
+          std::cout << "\033[1;31m" << "online_data = " << online_data.distFy[0] << " (sec)" << "\033[0m" << std::endl;
+          std::cout << "\033[1;31m" << "online_data = " << online_data.distFz[0] << " (sec)" << "\033[0m" << std::endl;
 
 
             nmpc_pc->nmpc_core(nmpc_struct,

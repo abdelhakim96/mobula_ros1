@@ -18,34 +18,34 @@ double Fz_dist;
 
 // BlueROV2 Model Parameters 
 const double f_s = 1.0;    //scaling factor;
-const double m = 11.5;    // BlueROV2 mass (kg)  
-const double g = 9.81;  // gravitational field strength (m/s^2)
+const double m = 11.4;    // BlueROV2 mass (kg)  
+const double g = 9.82;  // gravitational field strength (m/s^2)
 const double F_bouy = 114.8; // Buoyancy force (N)
 
-const double X_ud = -5.5 ; // Added mass in x direction (kg)
-const double Y_vd = -12.7 ; // Added mass in y direction (kg)
-const double Z_wd = -14.57 ; // Added mass in z direction (kg)
-const double N_rd = -0.12 ; // Added mass for rotation about z direction (kg)
+const double X_ud = -2.6 ; // Added mass in x direction (kg)
+const double Y_vd = -18.5 ; // Added mass in y direction (kg)
+const double Z_wd = -13.3 ; // Added mass in z direction (kg)
+const double N_rd = -0.28 ; // Added mass for rotation about z direction (kg)
 
-const double I_xx = 0.16 ; // Moment of inertia (kg.m^2)
-const double I_yy = 0.16 ; // Moment of inertia (kg.m^2)
-const double I_zz = 0.16 ; // Moment of inertia (kg.m^2)
+const double I_xx = 0.21 ; // Moment of inertia (kg.m^2)
+const double I_yy = 0.245 ; // Moment of inertia (kg.m^2)
+const double I_zz = 0.245 ; // Moment of inertia (kg.m^2)
 
-const double X_u = -4.03 ; // Linear damping coefficient in x direction (N.s/m)
-const double Y_v  = -6.22 ; // Linear damping coefficient  in y direction (N.s/m)
-const double Z_w = -5.18; // Linear damping coefficient  in z direction (N.s/m)
-const double N_r = -0.07 ;  // Linear damping coefficient for rotation about z direction (N.s/rad)
+const double X_u = -0.09 ; // Linear damping coefficient in x direction (N.s/m)
+const double Y_v  = -0.26 ; // Linear damping coefficient  in y direction (N.s/m)
+const double Z_w = -0.19; // Linear damping coefficient  in z direction (N.s/m)
+const double N_r = -4.64 ;  // Linear damping coefficient for rotation about z direction (N.s/rad)
 
-const double X_uc = -18.18 ; // quadratic damping coefficient in x direction (N.s^2/m^2)
-const double Y_vc = -21.66 ; // quadratic damping coefficient  in y direction (N.s^2/m^2)
-const double Z_wc = -36.99 ; // quadratic damping coefficient  in z direction (N.s^2/m^2)
-const double N_rc = -1.55  ; // quadratic damping coefficient for rotation about z direction (N.s^2/rad^2)
+const double X_uc = -34.96 ; // quadratic damping coefficient in x direction (N.s^2/m^2)
+const double Y_vc = -103.25 ; // quadratic damping coefficient  in y direction (N.s^2/m^2)
+const double Z_wc = -74.23 ; // quadratic damping coefficient  in z direction (N.s^2/m^2)
+const double N_rc = - 0.43 ; // quadratic damping coefficient for rotation about z direction (N.s^2/rad^2)
 
 double wind_x = 0.0;
 int count = 0;
 
 // Define the size of the buffer for the moving mean filter
-const size_t buffer_size = 5;
+const size_t buffer_size = 20;
 
 // Define a deque to store the last few acceleration measurements
 std::deque<std::vector<double>> acceleration_buffer;
@@ -116,7 +116,7 @@ public:
   // Callback function for wind disturbance
   void windCallback(const geometry_msgs::Wrench::ConstPtr& msg) {
     wind_x = msg->force.x;
-    count++;
+    
   }
 
 public:
@@ -142,14 +142,26 @@ int main(int argc, char **argv) {
   std_msgs::Float64MultiArray gp_y_features_msg;
   std_msgs::Float64MultiArray gp_z_features_msg;
 
-  ros::Rate rate(1 / 0.01);
+  ros::Rate rate(1 / 0.001);
 
   while(ros::ok()) {
     // Model calculations
     // Calculate Fx_dist, Fy_dist, Fz_dist using the filtered acceleration data
-    Fx_dist = (m - X_ud) * acceleration[0] - (control[0] + (m * velocity[1] + Y_vd * velocity[1]) * velocity[5] + (X_u + X_uc * sqrt(velocity[0] * velocity[0])) * velocity[0]);
-    Fy_dist = (m - Y_vd) * acceleration[1] - (control[1] - (m * velocity[0] + X_ud * velocity[0]) * velocity[5] + (Y_v + Y_vc * sqrt(velocity[1] * velocity[1])) * velocity[1]);
-    Fz_dist = (m - Z_wd) * acceleration[2] - (control[2] + (control[3] + Z_wc * sqrt(velocity[2] * velocity[2])) * velocity[2] + (m * g - F_bouy));
+   // std::cout << "yaw rate: " << velocity[5]<<std::endl;
+
+   count++;
+    Fx_dist = (m - X_ud) * acceleration[0] - (control[0] +
+     (m * velocity[1] -Y_vd * velocity[1]) * velocity[5] +
+      (X_u + X_uc * sqrt(velocity[0] * velocity[0])) * velocity[0]);
+
+    Fy_dist = (m - Y_vd) * acceleration[1] - 
+    (control[1] -
+     (m * velocity[0] - X_ud * velocity[0]) * velocity[5] + 
+     (Y_v + Y_vc * sqrt(velocity[1] * velocity[1])) * velocity[1]);
+
+    Fz_dist = (m - Z_wd) * acceleration[2] - 
+             (control[2] + (control[3] + Z_wc * sqrt(velocity[2] * velocity[2])) *
+              velocity[2] + (m * g - F_bouy));
 
     // Clear previous data
     gp_x_features_msg.data.clear();
@@ -159,18 +171,24 @@ int main(int argc, char **argv) {
     // Populate message data
     gp_x_features_msg.data.push_back(Fx_dist);
     gp_x_features_msg.data.push_back(Fx_dist);
+    //gp_x_features_msg.data.push_back(count);
+
     gp_x_features_msg.data.push_back(position[0]);
     gp_x_features_msg.data.push_back(velocity[0]);
     gp_x_features_msg.data.push_back(control[0]);
 
     gp_y_features_msg.data.push_back(Fy_dist);
     gp_y_features_msg.data.push_back(Fy_dist);
+    //gp_y_features_msg.data.push_back(count);
+
     gp_y_features_msg.data.push_back(position[1]);
     gp_y_features_msg.data.push_back(velocity[1]);
     gp_y_features_msg.data.push_back(control[1]);
 
     gp_z_features_msg.data.push_back(Fz_dist);
     gp_z_features_msg.data.push_back(Fz_dist);
+    //gp_z_features_msg.data.push_back(count);
+
     gp_z_features_msg.data.push_back(position[2]);
     gp_z_features_msg.data.push_back(velocity[2]);
     gp_z_features_msg.data.push_back(control[2]);

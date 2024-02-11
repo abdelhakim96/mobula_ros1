@@ -27,7 +27,7 @@ void dynamicReconfigureCallback(bluerov2_trajectory::set_trajectoryConfig& confi
     wp_x=config.wp_x;                                      // User specified waypoint x-coordinate
     wp_y=config.wp_y;                                      // User spcified waypoint y-coordinate
     wp_z=config.wp_z;                                      // User specified waypoint z-coordinate
-    wp_yaw=config.wp_yaw;                                  // User specified yaw angle 
+    wp_yaw =config.wp_yaw;                                  // User specified yaw angle 
     radius = config.des_radius;                            // User specified radius of turn for circle trajectory
     absvel = config.des_velocity;                          // Velocity of ROV during circle trajectory
     reg_on = config.reg_on;
@@ -103,10 +103,11 @@ int main(int argc, char** argv)
     
     current_pos.resize(3);
     current_vel.resize(3);
+    bool trajectory_reset = false;
     while (ros::ok())
     {
 
-
+        
         traj_on_msg.data = traj_on;
         ROS_INFO(" traj_on %f",  traj_on);
 
@@ -117,7 +118,8 @@ int main(int argc, char** argv)
   
         if (traj_type == 0)  //  Keep current position
            {
-             
+                 trajectory_reset = true;
+
              ROS_INFO("--------Position Hold!--------");
              
              if (init_pos)
@@ -133,6 +135,8 @@ int main(int argc, char** argv)
            
         if (traj_type == 1)  // Set point navigation defined by rqt_reconfigure (user)
             {
+                 trajectory_reset = true;
+
                ROS_INFO("--------Waypoint navigation: Go to Setpoint!--------");
                ref_traj_msg.x  = wp_x;
                ref_traj_msg.y  = wp_y;             
@@ -141,8 +145,21 @@ int main(int argc, char** argv)
                //init_pos=1;
             }
 
+       
+
         if (traj_type == 2)  // Circlular trajectory with specified radius,centre and velocity
             {
+
+
+            if (trajectory_reset== true) {
+                // Reset trajectory to start from the beginning
+                d_theta = 0.0; // Reset angle
+                // Reset other variables if needed
+
+                // Set the flag to true to indicate that the trajectory has been reset
+                trajectory_reset = false;
+            }
+
                ROS_INFO("--------Circle selected!--------");
                d_theta =  (absvel * sampleTime * radius + d_theta);
                double d_theta_2 = 2 * absvel * sampleTime * radius + d_theta;
@@ -170,6 +187,8 @@ int main(int argc, char** argv)
                ref_vel_msg.y = -v_body;
                ref_vel_msg.z = 0.0;
                double yaw_to_center;
+               ref_yaw_msg.data = wp_yaw* ((M_PI)/180.0);
+
 
              if (!current_pos.empty()) {
                     // Calculate yaw angle to face the center of the circle
@@ -180,14 +199,18 @@ int main(int argc, char** argv)
 
                  yaw_to_center =0.0;
              }
-                ref_yaw_msg.data = (d_theta - M_PI)*0.0 ;
+               // ref_yaw_msg.data = (d_theta - M_PI)*0.0 ;
               // bool init_pos=1;
 
-              cout <<"Yaw ref"<< ref_yaw_msg.data * (180/M_PI) *0.0 <<std::endl;
+              cout <<"Yaw ref"<< ref_yaw_msg.data * (180/M_PI)  <<std::endl;
               cout <<"pos cb "<< current_pos.at(0) <<std::endl;
             }
+
+            
         if (traj_type == 3)  // Read reference trajectory from a textfile
-            {
+            { 
+                 trajectory_reset = true;
+
                ROS_INFO("--------External trajectory: Reading trajectory from txt file!--------"); 
                while (inputFile >> wp_ext_x >> wp_ext_y >> wp_ext_z >> wp_ext_yaw)
                       {
@@ -197,12 +220,14 @@ int main(int argc, char** argv)
                         ref_yaw_msg.data = wp_ext_yaw;
                         ref_pos_pub.publish(ref_traj_msg);   
                        }  
+
              //  bool init_pos=1;        
             }
-        
+
+        reg_on_pub.publish(reg_on_msg);
+
         }
         reg_on_msg.data = reg_on;
-        reg_on_pub.publish(reg_on_msg);
         ref_pos_pub.publish(ref_traj_msg);
         //ref_pos_pub_rviz.publish(ref_traj_msg);
         ref_vel_pub.publish(ref_vel_msg);
