@@ -7,10 +7,10 @@ plt.close('all')
 folder_name = ""
 
 # File paths containing the recorded data
-file_name_gp_nogp = os.path.join(folder_name, "lambda09_combined.txt")
-file_name_gp_lambda01 = os.path.join(folder_name, "lambda1_combined.txt")
-file_name_gp_lambda08 = os.path.join(folder_name, "lambda1_sine11.txt")
-file_name_gp_lambda09 = os.path.join(folder_name, "lambda09_sine.txt")
+file_name_gp_nogp = os.path.join(folder_name, "no_gp.txt")
+file_name_gp_lambda01 = os.path.join(folder_name, "recorded_data_brov.txt")
+file_name_gp_lambda08 = os.path.join(folder_name, "lambda_08_sine.txt")
+file_name_gp_lambda09 = os.path.join(folder_name, "lambda_09_sine.txt")
 
 file_name_macgp = os.path.join(folder_name, "macgp_new.txt")
 file_name_newest = os.path.join(folder_name, "recorded_data_brov11.txt")  # Added line for newest.txt
@@ -79,7 +79,7 @@ print("macgp Data:", len(actual_positions_x_macgp))
 print("newest Data:", len(actual_positions_x_newest))  # Added line for newest.txt
 
 # Plotting a subset of 650 points from each trajectory
-subset_size = 3000
+subset_size = 1000
 
 plt.figure(figsize=(10, 6))
 
@@ -93,7 +93,7 @@ plt.plot(actual_positions_x_gp_lambda01[:subset_size], actual_positions_y_gp_lam
 plt.plot(actual_positions_x_gp_lambda08[:subset_size], actual_positions_y_gp_lambda08[:subset_size], linewidth=2, label='lambda08', color='green')
 
 # Plot for lambda09
-plt.plot(actual_positions_x_gp_lambda09[:subset_size], actual_positions_y_gp_lambda09[:subset_size], linewidth=2, label='lambda09', color='green')
+plt.plot(actual_positions_x_gp_lambda09[:subset_size], actual_positions_y_gp_lambda09[:subset_size], linewidth=2, label='lambda09', color='red')
 
 # Plot for macgp
 plt.plot(actual_positions_x_macgp[:subset_size], actual_positions_y_macgp[:subset_size], linewidth=2, label='macgp', color='red')

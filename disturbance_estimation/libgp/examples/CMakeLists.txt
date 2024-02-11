@@ -11,6 +11,9 @@ TARGET_LINK_LIBRARIES(gp_example1 gp)
 ADD_EXECUTABLE(gp_example2 gp_example2.cc test_functions.cpp)
 TARGET_LINK_LIBRARIES(gp_example2 gp)
 
+ADD_EXECUTABLE(gp_example_forget_factor gp_example_forget_factor.cc test_functions.cpp)
+TARGET_LINK_LIBRARIES(gp_example_forget_factor gp)
+
 ADD_EXECUTABLE(gp_example_mass_change gp_example_mass_change.cc)
 TARGET_LINK_LIBRARIES(gp_example_mass_change gp)
 

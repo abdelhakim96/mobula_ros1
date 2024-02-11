@@ -69,7 +69,7 @@ protected:
     /** Prior covariance matrix for induced points */
     Eigen::MatrixXd Suu;
 
-    void update_alpha(double lamb = 1.0) override;
+    void update_alpha() override;
 
     /** Computes prior mean and variance for induced points
      *  @param _sampleset input sampleset.  */

@@ -45,7 +45,7 @@ double wind_x = 0.0;
 int count = 0;
 
 // Define the size of the buffer for the moving mean filter
-const size_t buffer_size = 20;
+const size_t buffer_size = 1;
 
 // Define a deque to store the last few acceleration measurements
 std::deque<std::vector<double>> acceleration_buffer;
@@ -172,26 +172,30 @@ int main(int argc, char **argv) {
     gp_x_features_msg.data.push_back(Fx_dist);
     gp_x_features_msg.data.push_back(Fx_dist);
     //gp_x_features_msg.data.push_back(count);
-
-    gp_x_features_msg.data.push_back(position[0]);
-    gp_x_features_msg.data.push_back(velocity[0]);
-    gp_x_features_msg.data.push_back(control[0]);
+    //gp_x_features_msg.data.push_back(position[0]);
+    //gp_x_features_msg.data.push_back(velocity[0]);
+    //gp_x_features_msg.data.push_back(control[0]);
+    //gp_x_features_msg.data.push_back(acceleration[0]);
+    //gp_x_features_msg.data.push_back(velocity[5]);
 
     gp_y_features_msg.data.push_back(Fy_dist);
     gp_y_features_msg.data.push_back(Fy_dist);
     //gp_y_features_msg.data.push_back(count);
-
-    gp_y_features_msg.data.push_back(position[1]);
-    gp_y_features_msg.data.push_back(velocity[1]);
-    gp_y_features_msg.data.push_back(control[1]);
+    //gp_y_features_msg.data.push_back(position[1]);
+    //gp_y_features_msg.data.push_back(velocity[1]);
+    //gp_y_features_msg.data.push_back(control[1]);
+    //gp_y_features_msg.data.push_back(acceleration[1]);
+    //gp_y_features_msg.data.push_back(velocity[5]);
 
     gp_z_features_msg.data.push_back(Fz_dist);
     gp_z_features_msg.data.push_back(Fz_dist);
     //gp_z_features_msg.data.push_back(count);
 
-    gp_z_features_msg.data.push_back(position[2]);
-    gp_z_features_msg.data.push_back(velocity[2]);
-    gp_z_features_msg.data.push_back(control[2]);
+    //gp_z_features_msg.data.push_back(position[2]);
+    //gp_z_features_msg.data.push_back(velocity[2]);
+    //gp_z_features_msg.data.push_back(control[2]);
+    //gp_z_features_msg.data.push_back(acceleration[2]);
+    //gp_z_features_msg.data.push_back(control[3]);
 
     // Publish the gp_features
     featureGeneratorNode.gp_x_features_pub.publish(gp_x_features_msg);
