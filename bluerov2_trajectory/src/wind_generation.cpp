@@ -238,8 +238,8 @@ int main(int argc, char** argv)
     t_loop = ros::Time::now().toSec() - t_last;
 
     // Define the duration of each phase of the wind pattern
-    double phase_duration = wind_time_period / 4.0;
-    std::normal_distribution<double> disturb(0, noise_stddev/5);
+    double phase_duration = (wind_time_period *3.2) / 4.0;
+    std::normal_distribution<double> disturb(0, noise_stddev/10);
 
     // Calculate wind force based on the current phase of the pattern
     if (t_loop < phase_duration) {
@@ -252,7 +252,7 @@ int main(int argc, char** argv)
         // Step function phase
        //wind_magnitude = wind_component.array() * ( mean_wind_force + 5 * max_wind_force * sin(12 * M_PI * (t_loop - phase_duration) / phase_duration));
                             wind_magnitude = wind_component.array() * mean_wind_force +
-                    wind_component.array() * max_wind_force * 5*
+                    wind_component.array() * max_wind_force * 2*
                     (0.5 * std::pow(sin((4 * M_PI *10 / wind_time_period) * t_loop), 4) +
                         std::pow(cos((2 * M_PI*10 / wind_time_period) * (t_loop)), 3) +
                         std::pow(sin((2 * M_PI*10 / wind_time_period) * t_loop), 2) +

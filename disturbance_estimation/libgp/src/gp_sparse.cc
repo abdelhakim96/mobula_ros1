@@ -166,7 +166,7 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> SparseGaussianProcess::compute_KmmKm
     return std::make_pair(Kmm, Kmu);
 }
 
-void SparseGaussianProcess::update_alpha()
+void SparseGaussianProcess::update_alpha(double lamb )
 {
     // can previously computed values be used?
     if (!alpha_needs_update)
