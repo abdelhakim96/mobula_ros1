@@ -238,7 +238,7 @@ int main(int argc, char** argv)
     t_loop = ros::Time::now().toSec() - t_last;
 
     // Define the duration of each phase of the wind pattern
-    double phase_duration = (wind_time_period *3.2) / 4.0;
+    double phase_duration = (wind_time_period *2.0) / 4.0;
     std::normal_distribution<double> disturb(0, noise_stddev/10);
 
     // Calculate wind force based on the current phase of the pattern

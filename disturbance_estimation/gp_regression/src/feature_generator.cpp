@@ -45,7 +45,7 @@ double wind_x = 0.0;
 int count = 0;
  
 // Define the size of the buffer for the moving mean filter
-const size_t buffer_size = 5;
+const size_t buffer_size = 1;
  
 // Define a deque to store the last few acceleration measurements
 std::deque<std::vector<double>> acceleration_buffer;
