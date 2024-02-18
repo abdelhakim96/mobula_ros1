@@ -1,6 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.backends.backend_pdf import PdfPages
 
 plt.close('all')
 
@@ -102,7 +103,7 @@ def read_data(file_path, ref_x_list, ref_y_list, actual_x_list, actual_y_list, W
                 W2_list.append(float(data[18]))
                 W3_list.append(float(data[19]))
                 mu_y_list.append(float(data[27]))
-                gt_y_list.append(float(data[29]))
+                gt_y_list.append(float(data[24]))
                 
     except Exception as e:
         print(f"Error reading data from {file_path}: {e}")
@@ -122,9 +123,10 @@ read_data(file_name_gp_lambda9_sine, ref_positions_x_gp_lambda9_sine, ref_positi
 
 # Start time and duration parameters
 t_start = 1
-duration = 3
+duration = 620
 subset_size= duration
 
+colors = ['#9467bd','#2ca02c', '#d62728', '#1f77b4','#ff7f0e' ]
 
 # Calculate distance from each point in the trajectory to the closest point on the unit circle
 def distance_to_unit_circle_trajectory(x_positions, y_positions):
@@ -148,31 +150,42 @@ distances_gp_mac_sine_closest = distance_to_unit_circle_trajectory(actual_positi
 distances_gp_lambda9_sine_closest = distance_to_unit_circle_trajectory(actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine)
 
 # Calculate mean distances for each dataset
-mean_distance_gp_nogp_closest = np.mean(distances_gp_nogp_closest)
-mean_distance_gp_lambda01_sine_closest = np.mean(distances_gp_lambda1_sine_closest)
-mean_distance_gp_lambda8_sine_closest = np.mean(distances_gp_lambda8_sine_closest)
-mean_distance_gp_mac_sine_closest = np.mean(distances_gp_mac_sine_closest)
-mean_distance_gp_lambda9_sine_closest = np.mean(distances_gp_lambda9_sine_closest)
+mean_distance_gp_nogp_closest = np.mean(distances_gp_nogp_closest[:duration])
+mean_distance_gp_lambda01_sine_closest = np.mean(distances_gp_lambda1_sine_closest[:duration])
+mean_distance_gp_lambda8_sine_closest = np.mean(distances_gp_lambda8_sine_closest[:duration])
+mean_distance_gp_mac_sine_closest = np.mean(distances_gp_mac_sine_closest[:duration])
+mean_distance_gp_lambda9_sine_closest = np.mean(distances_gp_lambda9_sine_closest[:duration])
+
+pdf_file_path = "plots.pdf"
+pdf_pages = PdfPages(pdf_file_path)
+
+
 
 # Plotting the distances
 plt.figure(figsize=(12, 6))
 
+dur = duration 
+t_end = t_start + dur   # Calculate end time
 
 # Plot the distances for each dataset
-plt.plot(range(t_start, t_start + duration), distances_gp_lambda1_sine_closest[t_start:t_start + duration], color='green', label=f'Lambda 0.1 (Mean: {mean_distance_gp_lambda01_sine_closest:.3g})')
-plt.plot(range(t_start, t_start + duration), distances_gp_lambda9_sine_closest[t_start:t_start + duration], color='brown', label=f'Lambda 0.5 (Mean: {mean_distance_gp_lambda9_sine_closest:.3g})')
-plt.plot(range(t_start, t_start + duration), distances_gp_mac_sine_closest[t_start:t_start + duration], color='cyan', label=f'Ours (Mean: {mean_distance_gp_mac_sine_closest:.3g})')
-plt.plot(range(t_start, t_start + duration), distances_gp_lambda8_sine_closest[t_start:t_start + duration], color='purple', label=f'Lambda 0.8 (Mean: {mean_distance_gp_lambda8_sine_closest:.3g})')
+skip = 10  # Skip every 10 points
+plt.plot(range(t_start, t_end, skip), distances_gp_nogp_closest[t_start:t_end:skip], linewidth=2,color=colors[4], label=f'No GP (Mean: {mean_distance_gp_nogp_closest:.3g})')
+plt.plot(range(t_start, t_end, skip), distances_gp_lambda1_sine_closest[t_start:t_end:skip], linewidth=2,color=colors[0], label=f'Lambda 1.0 (Mean: {mean_distance_gp_lambda01_sine_closest:.3g})')
+plt.plot(range(t_start, t_end, skip), distances_gp_lambda8_sine_closest[t_start:t_end:skip],linewidth=2, color=colors[1], label=f'Lambda 0.8 (Mean: {mean_distance_gp_lambda8_sine_closest:.3g})')
+plt.plot(range(t_start, t_end, skip), distances_gp_lambda9_sine_closest[t_start:t_end:skip],linewidth=2, color=colors[2], label=f'Lambda 0.5 (Mean: {mean_distance_gp_lambda9_sine_closest:.3g})')
+plt.plot(range(t_start, t_end, skip), distances_gp_mac_sine_closest[t_start:t_end:skip], linewidth=2, color=colors[3], label=f'Ours (Mean: {mean_distance_gp_mac_sine_closest:.3g})')
+# Add labels and title
+plt.xlabel('Time')
+plt.ylabel('Error')
+plt.title('Error in Trajectory Tracking')
 
-
-plt.xlabel('Time Step')
-plt.ylabel('Distance to Closest Point on Unit Circle')
-plt.title('Distance to Closest Point on Unit Circle Against Time')
+# Add legend
 plt.legend()
-plt.grid(True)
 
+
+plt.grid(True)
+pdf_pages.savefig()
 # Plotting Trajectories
-plt.figure(figsize=(12, 6))
 
 # Function to plot trajectories for a subset of data
 def plot_trajectories(ax, actual_x, actual_y, label, t_start, duration, color):
@@ -186,28 +199,62 @@ def plot_dist(ax, gt_y_values, label, t_start, duration, color):
 def plot_dist1(ax, gt_y_values, label, t_start, duration, color):
     ax.plot(range(t_start, t_start + duration), gt_y_values[t_start:t_start + duration], label=label, color=color ,linestyle='--',linewidth=4 )
 
+t1 = t_start
+t2= 317
+t3 = 630-317
+#t2 = int(duration/2)
 
-# Plot for the unit circle (Reference)
+#t3 = int(duration-40)
+
+plt.figure(figsize=(10, 10))
+
+plt.subplot(1, 2, 1)  # Subplot 1: First Cycle
 theta = np.linspace(0, 2*np.pi, 100)
-plt.plot(1 + np.cos(theta), np.sin(theta), linestyle='--', linewidth=4, label='Reference', color='black')
-# Plot for "sine" datasets
-#plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t_start+250, duration, 'blue')
-plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, 'Lambda = 1.0', t_start, duration+700, 'green')
-plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t_start, duration+700, 'orange')
-plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8', t_start, duration+700, 'purple')
-plot_trajectories(plt, actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine, 'Ours', t_start, duration+700, 'cyan')
+plt.plot(1 + np.cos(theta), np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
+plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t_start, t2, color=colors[4])
+plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, 'Lambda = 1.0', t_start, t2, color=colors[0])
+plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8', t_start, t2, color=colors[1])
+plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t_start, t2, color=colors[2])
+plot_trajectories(plt, actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine, 'Ours', t_start, t2, color=colors[3])
 plt.legend()
+plt.xlabel('X [m]')
+plt.ylabel('Y [m]')
+plt.title('First Cycle')
+plt.gca().set_aspect('equal', adjustable='box')  # Equal aspect ratio
 
+
+plt.subplot(1, 2, 2)  # Subplot 2: Second Cycle
+plt.plot(1 + np.cos(theta), np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
+plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t2, t3, color=colors[4])
+plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, 'Lambda = 1.0', t2, t3, color=colors[0])
+plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8', t2, t3, color=colors[1])
+plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t2, t3, color=colors[2])
+plot_trajectories(plt, actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine, 'Ours', t2, t3, color=colors[3])
+plt.legend()
+plt.xlabel('X [m]')
+plt.ylabel('Y [m]')
+plt.title('Second Cycle')
+plt.gca().set_aspect('equal', adjustable='box')  # Equal aspect ratio
+
+plt.tight_layout()  # Adjust layout to prevent overlap
+
+
+
+pdf_pages.savefig()
 plt.figure(figsize=(12, 6))
+
+
 
 # Plot gt_y for each method
 #plot_gt_y(plt, gt_y_nogp, 'No GP', t_start, duration, 'blue')
-plot_dist(plt, mu_y_1, 'lambda = 1', t_start, duration+800, 'blue')
-plot_dist(plt, mu_y_8, 'lambda = 0.8', t_start, duration+600, 'green')
-plot_dist(plt, mu_y_9, 'lambda = 0.6', t_start, duration+600, 'red')
-plot_dist(plt, mu_y_mac, ' ours ', t_start, duration+800, 'cyan')
-plot_dist1(plt, gt_y_1, 'ground truth',  t_start, duration+700, color= 'black')
+plot_dist(plt, mu_y_1, 'lambda = 1', t_start, duration , color=colors[0])
+plot_dist(plt, mu_y_8, 'lambda = 0.8', t_start, duration , color=colors[1])
+plot_dist(plt, mu_y_9, 'lambda = 0.5', t_start, duration , color=colors[2])
+plot_dist(plt, mu_y_mac, ' Ours ', t_start, duration , color=colors[3])
+gt_y_1_scaled = [y / 11.4 for y in gt_y_1]
 
+# Call plot_dist1 with the scaled data
+plot_dist1(plt, gt_y_1_scaled, 'ground truth', t_start, duration, color='black')
 
 
 plt.xlabel('Time')
@@ -216,7 +263,7 @@ plt.title('Disturbance')
 plt.legend()
 plt.grid(True)
 
-
+pdf_pages.savefig()
 
 def plot_dist1(ax, gt_y_values, mu_y_values, label, t_start, duration, color):
     abs_error = [abs(gt - mu) for gt, mu in zip(gt_y_values[t_start:t_start + duration], mu_y_values[t_start:t_start + duration])]
@@ -227,13 +274,13 @@ plt.figure(figsize=(12, 6))
 
 # Define t_start and duration
 t_start = 0
-duration = 820
+#duration = 820
 
 # Plot error for different values of lambda
-plot_dist1(plt, gt_y_1, mu_y_1, 'Error (Lambda = 1)', t_start, duration, 'blue')
-plot_dist1(plt, gt_y_9, mu_y_9, 'Error (Lambda = 0.5)', t_start, duration, 'red')
-plot_dist1(plt, gt_y_mac, mu_y_mac, 'Error (Ours)', t_start, duration, 'cyan')
-plot_dist1(plt, gt_y_8, mu_y_8, 'Error (Lambda = 0.8)', t_start, duration, 'orange')
+plot_dist1(plt, gt_y_1_scaled, mu_y_1, 'Lambda = 1', t_start, duration, color=colors[0])
+plot_dist1(plt, gt_y_1_scaled, mu_y_8, 'Lambda = 0.8', t_start, duration, color=colors[1])
+plot_dist1(plt, gt_y_1_scaled, mu_y_9, 'Lambda = 0.5', t_start, duration, color=colors[2])
+plot_dist1(plt, gt_y_1_scaled, mu_y_mac, 'Ours', t_start, duration, color=colors[3])
 
 # Add legend
 plt.legend()
@@ -241,9 +288,17 @@ plt.legend()
 
 
 plt.xlabel('Time')
-plt.ylabel('Error in Prediction (gt_y_1 - mu_y)')
+plt.ylabel('Absolute Error ')
 plt.title('Error in Prediction')
 plt.legend()
 plt.grid(True)
 
+
+pdf_pages.savefig()
+pdf_pages.close()
+
 plt.show()
+
+
+
+print("PDF saved successfully.")
