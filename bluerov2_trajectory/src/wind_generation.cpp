@@ -214,6 +214,62 @@ int main(int argc, char** argv)
                         sin((2 * M_PI / wind_time_period) * t_loop));
                 break;
                 //hakim edit
+
+                /*
+            case 4: // Wind Farm 
+      if (print_flag_sinus_comb3 == 1)
+    {
+        t_last = ros::Time::now().toSec();
+        t_loop = t - t_last;
+
+        ROS_INFO("--------Wind Farm wind force selected!--------");
+        print_flag_traj_start = 1;
+        print_flag_wind_start = 1;
+        print_flag_const = 1;
+        print_flag_sinus = 1;
+        print_flag_sinus_comb1 = 1;
+        print_flag_sinus_comb2 = 1;
+        print_flag_sinus_comb3 = 0;
+        print_flag_windfarm = 0;
+    }
+
+    // Set wind magnitude based on input wind speed
+    //wind_magnitude = { ws_x, ws_y, 0 };
+
+    // Calculate time elapsed since the last update
+    t_loop = ros::Time::now().toSec() - t_last;
+
+    // Define the duration of each phase of the wind pattern
+    double phase_duration = wind_time_period / 4.0;
+    std::normal_distribution<double> disturb(0, noise_stddev/5);
+
+    // Calculate wind force based on the current phase of the pattern
+    if (t_loop < phase_duration) {
+        // Linearly increasing phase
+        wind_magnitude = wind_component.array() * (disturb(rand_seed) + 2*t_loop / phase_duration +  max_wind_force * sin(12 * M_PI * (t_loop - phase_duration) / phase_duration));
+    } else if (t_loop < 2 * phase_duration) {
+        // Sine wave phase
+        wind_magnitude = wind_component.array() * (disturb(rand_seed) +mean_wind_force)  ;
+    } else if (t_loop < 3 * phase_duration ) {
+        // Step function phase
+       //wind_magnitude = wind_component.array() * ( mean_wind_force + 5 * max_wind_force * sin(12 * M_PI * (t_loop - phase_duration) / phase_duration));
+                            wind_magnitude = wind_component.array() * mean_wind_force +
+                    wind_component.array() * max_wind_force * 5*
+                    (0.5 * std::pow(sin((4 * M_PI *10 / wind_time_period) * t_loop), 4) +
+                        std::pow(cos((2 * M_PI*10 / wind_time_period) * (t_loop)), 3) +
+                        std::pow(sin((2 * M_PI*10 / wind_time_period) * t_loop), 2) +
+                        sin((2 * M_PI*10 / wind_time_period) * t_loop));
+
+    } else if (t_loop < 4 * phase_duration) {
+        // Linearly decreasing phase
+        wind_magnitude = wind_component.array() * (disturb(rand_seed) + mean_wind_force - mean_wind_force * ((t_loop - 3 * phase_duration) / phase_duration)+  0.5 * max_wind_force * sin(22 * M_PI * (t_loop - phase_duration) / phase_duration));
+    } else {
+        // Restart the pattern
+        t_last = ros::Time::now().toSec();
+    }
+    break;
+   */
+                
 case 4: // Wind Farm (replacing with Test case)
     if (print_flag_sinus_comb3 == 1)
     {
@@ -231,15 +287,29 @@ case 4: // Wind Farm (replacing with Test case)
     }
     if (t_loop < 30) {
         // Sine wave for the first 30 seconds
-        wind_magnitude = wind_component.array() * (mean_wind_force + max_wind_force * sin((2 * M_PI / wind_time_period) * t_loop));
+        wind_magnitude = wind_component.array() * (mean_wind_force + 2 * max_wind_force * sin((2 * M_PI / wind_time_period) * t_loop));
     } else {
+
+       if (t_loop < 60) {
+        std::normal_distribution<double> disturb(0, 0.1);
         // Switch to sine wave comb2 for the rest of the time
-        wind_magnitude = wind_component.array() * mean_wind_force +
-            wind_component.array() * max_wind_force *
-            (0.5 * std::pow(sin((4 * M_PI / wind_time_period) * t_loop), 4) +
-                std::pow(cos((2 * M_PI / wind_time_period) * (t_loop)), 3) +
-                std::pow(sin((2 * M_PI / wind_time_period) * t_loop), 2) +
+        wind_magnitude = wind_component.array() * (mean_wind_force) * 5 +disturb(rand_seed)+
+            wind_component.array() * max_wind_force * 5 *
+            (0.5 * std::pow(sin((2 * M_PI / wind_time_period) * t_loop), 4) +
+                std::pow(cos((1 * M_PI / wind_time_period) * (t_loop)), 3) +
+                std::pow(sin((1 * M_PI / wind_time_period) * t_loop), 2) +
                 sin((2 * M_PI / wind_time_period) * t_loop));
+    }
+     
+    else {
+
+        // Apply a square wave of amplitude -2 and frequency of 10 seconds
+        double square_wave_amplitude = -2.0;
+        double square_wave_frequency = 1.0 / 20.0; // Frequency is the inverse of the time period
+         wind_magnitude = wind_component.array() * (mean_wind_force) + 1.0 + 
+            wind_component.array() * max_wind_force * 5  * (std::sin(2 * M_PI * square_wave_frequency * t_loop) > 0 ? 1 : -1);
+      
+    }
     }
     break;
 

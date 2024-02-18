@@ -24,8 +24,8 @@ IF(USAGE_IN_ROS_BRIDGE)
     OPTION(BUILD_TESTS "Build tests" OFF)
     OPTION(BUILD_EXAMPLES "Build examples" OFF)
 ELSE()
-    OPTION(BUILD_TESTS "Build tests" ON)
-    OPTION(BUILD_EXAMPLES "Build examples" ON)
+    OPTION(BUILD_TESTS "Build tests" OFF)
+    OPTION(BUILD_EXAMPLES "Build examples" OFF)
 ENDIF()
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_MODULE_PATH})
@@ -60,11 +60,10 @@ ELSE()
 	${CMAKE_BINARY_DIR}/libgp.pc @ONLY)
 ENDIF()
 
-# ----- Add example targets -----
-IF(BUILD_EXAMPLES)
-  ADD_SUBDIRECTORY(examples)
+# ----- Testing -----
+IF(BUILD_TESTS)
+  ADD_SUBDIRECTORY(tests)
 ENDIF()
-
 
 # ----- Install -----
 INSTALL(FILES ${LIBGP_INTERFACES} DESTINATION include/gp)

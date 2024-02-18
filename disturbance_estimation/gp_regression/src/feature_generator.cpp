@@ -4,7 +4,9 @@
 #include <geometry_msgs/Vector3Stamped.h>
 #include <geometry_msgs/Wrench.h>
 #include <deque>
- 
+
+
+
 std::vector<double> angles = {0.0, 0.0, 0.0};
 std::vector<double> angles_d = {0.0, 0.0, 0.0};
 std::vector<double> acceleration = {0.0, 0.0, 0.0};
@@ -142,7 +144,7 @@ int main(int argc, char **argv) {
   std_msgs::Float64MultiArray gp_y_features_msg;
   std_msgs::Float64MultiArray gp_z_features_msg;
  
-  ros::Rate rate(1 / 0.01);
+  ros::Rate rate(200);
  
   while(ros::ok()) {
     // Model calculations
@@ -151,16 +153,25 @@ int main(int argc, char **argv) {
     Fx_dist = (m - X_ud) * acceleration[0] - (control[0] +
      (m * velocity[1] -Y_vd * velocity[1]) * velocity[5] +
       (X_u + X_uc * sqrt(velocity[0] * velocity[0])) * velocity[0]);
+
+    Fx_dist = Fx_dist/m; 
  
     Fy_dist = (m - Y_vd) * acceleration[1] -
     (control[1] -
      (m * velocity[0] - X_ud * velocity[0]) * velocity[5] +
      (Y_v + Y_vc * sqrt(velocity[1] * velocity[1])) * velocity[1]);
  
+    
+    Fy_dist = Fy_dist/m; 
+
     Fz_dist = (m - Z_wd) * acceleration[2] -
              (control[2] + (control[3] + Z_wc * sqrt(velocity[2] * velocity[2])) *
               velocity[2] + (m * g - F_bouy));
- 
+    
+    
+    Fz_dist = Fz_dist/m; 
+
+
     // Clear previous data
     gp_x_features_msg.data.clear();
     gp_y_features_msg.data.clear();

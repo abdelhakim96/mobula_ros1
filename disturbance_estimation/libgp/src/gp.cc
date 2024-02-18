@@ -131,6 +131,8 @@ GaussianProcess::GaussianProcess(const GaussianProcess& gp)
     k_star = gp.k_star;
     alpha_needs_update = gp.alpha_needs_update;
     L = gp.L;
+    // Added by Mohit (to support with SGP with Lambda)
+    lambda_prev = gp.lambda_prev;
 
     // copy covariance function
     CovFactory factory;
@@ -159,107 +161,29 @@ GaussianProcess::~GaussianProcess()
         delete cf;
 }
 
-double GaussianProcess::f(const double x[],  const double lamb )
+double GaussianProcess::f(const double x[])
 {
-    //if (sampleset->empty())
-   //     return 0;
-   // Eigen::Map<const Eigen::VectorXd> x_star(x, input_dim);
-   // compute();
-   // update_alpha();
-   // update_k_star(x_star);
-   // return k_star.dot(alpha);
-
-   // added by hakim
-    size_t n = sampleset->size() ;
-    size_t nu = sampleset->size() ;
-
-    //double lamb=0.6;
-    double sigma =0.001;
-    Eigen::MatrixXd Lambda_m = Eigen::MatrixXd::Identity(n, n);
-    Lambda_m(0,0) = 1.0;  // Last element is always 1.0.
-    for (int i = n - 2; i >= 0; i--) {
-        Lambda_m(i, i) = Lambda_m(i + 1, i + 1) * lamb;
-    }
-   
-   
-
-
-
-
-
-   //Matrices
-
     if (sampleset->empty())
         return 0;
- 
     Eigen::Map<const Eigen::VectorXd> x_star(x, input_dim);
-    Eigen::MatrixXd Kxx = Eigen::MatrixXd::Identity(n, n);
-    Eigen::MatrixXd Kxu = Eigen::MatrixXd::Identity(n, nu);
-    Eigen::MatrixXd Ksu = Eigen::MatrixXd::Identity(1, nu);
-    Eigen::MatrixXd Kuu = Eigen::MatrixXd::Identity(nu, nu);
-    Eigen::MatrixXd I = Eigen::MatrixXd::Identity(nu, nu);
-    Eigen::MatrixXd iK_uu = Eigen::MatrixXd::Identity(nu, nu);
-    Eigen::MatrixXd L_B = Eigen::MatrixXd::Identity(nu, nu);
-    Eigen::MatrixXd B_lambda = Eigen::MatrixXd::Identity(nu, nu);
-
-
-    for(size_t i = 0; i < nu; ++i) {
-      for(size_t j = 0; j <= i; ++j) {
-        (Kuu)(i, j) = cf->get(sampleset->x(i), sampleset->x(j));
-      }
-    }
-
-        for(size_t i = 0; i < n; ++i) {
-      for(size_t j = 0; j <= i; ++j) {
-        (Kxx)(i, j) = cf->get(sampleset->x(i), sampleset->x(j));
-      }
-    }
-
-
-    for(size_t i = 0; i < n; ++i) {
-      for(size_t j = 0; j < nu; ++j) {
-        // TO BE: check if the values for noise covariance is coming up in the below evaluation
-        (Kxu)(i, j) = cf->get(sampleset->x(i), sampleset->x(j));
-      }
-    }
-
-
-    Eigen::MatrixXd iB_lambda = Kuu + pow(sigma, -2) * (Kxu.transpose() * Lambda_m * Kxu);
-
-    
-    // compute inverses using Chelosky decomp
-    B_lambda = iB_lambda.llt().solve(I);
-    iK_uu = Kuu.llt().solve(I);
-
-
-    const std::vector<double>& targets = sampleset->y();
-    Eigen::Map<const Eigen::VectorXd> y(&targets[0], sampleset->size());
-
+    compute();
+    update_alpha();
     update_k_star(x_star);
-    
+    // expected_f_star = k_star'*alpha
+    return k_star.dot(alpha);
+}
 
-    Eigen::MatrixXd mu = pow(sigma, -2) * k_star.transpose() * B_lambda * Kxu.transpose() * Lambda_m * y;
-
-
-
-   // Eigen::MatrixXd mu ;
-
-
-
-
-
-
-
-  std::cout << "k_star: " << k_star.rows() << std::endl;
-  std::cout << "k_star: " << k_star.cols() << std::endl;
-  std::cout << "B_lambda: " << B_lambda.rows() << std::endl;
-  std::cout << "B_lambda: " << B_lambda.cols() << std::endl;
-    std::cout << "Kxu: " << Kxu.rows() << std::endl;
-  std::cout << "Kxu: " << Kxu.cols() << std::endl;
-    //mu = k_star.transpose()*alpha;
-    std::cout << "mu: " << mu(0,0) << std::endl;
-
-    return mu(0,0);
+// Added by Mohit
+double GaussianProcess::f(const double x[], const double& lambda)
+{
+    if (sampleset->empty())
+        return 0;
+    Eigen::Map<const Eigen::VectorXd> x_star(x, input_dim);
+    compute();
+    update_alpha(lambda);
+    update_k_star(x_star);
+    // expected_f_star = k_star'*alpha
+    return k_star.dot(alpha);
 }
 
 // Added by Mohit
@@ -286,6 +210,21 @@ double GaussianProcess::var(const double x[])
     int n = sampleset->size();
     // v = inv(L)*k_star
     Eigen::VectorXd v = L.topLeftCorner(n, n).triangularView<Eigen::Lower>().solve(k_star);
+    // var_f_star = k_star_star - v'*v
+    return cf->get(x_star, x_star) - v.dot(v);
+}
+
+// Added by Mohit
+double GaussianProcess::var(const double x[], const double& lambda)
+{
+    if (sampleset->empty())
+        return 0;
+    Eigen::Map<const Eigen::VectorXd> x_star(x, input_dim);
+    compute();
+    update_alpha(lambda);
+    update_k_star(x_star);
+    // v = inv(L_lambda)*k_star
+    Eigen::VectorXd v = L_lambda.triangularView<Eigen::Lower>().solve(k_star);
     // var_f_star = k_star_star - v'*v
     return cf->get(x_star, x_star) - v.dot(v);
 }
@@ -437,8 +376,19 @@ void GaussianProcess::update_k_star_noisy_inp(const Eigen::VectorXd& x_star, Eig
     }
 }
 
-void GaussianProcess::update_alpha(double lamb)
+void GaussianProcess::update_alpha()
 {
+    // check if forgetting factor approach has been used
+    // This approach resets the lambda_prev, which makes
+    //it recompute alpha when the forgetting factor function is called.
+    //This causes one extra computation.
+    // TODO: find a better approach.
+    if (lambda_prev != 0)
+    {
+        alpha_needs_update = true;
+        lambda_prev = 0.0;
+    }
+
     // can previously computed values be used?
     if (!alpha_needs_update)
         return;
@@ -454,6 +404,62 @@ void GaussianProcess::update_alpha(double lamb)
     // TO BE: check which one is correct? Top one is the original one
     L.topLeftCorner(n, n).triangularView<Eigen::Lower>().adjoint().solveInPlace(alpha);  // Seems wrong!!!
     //    L.topLeftCorner(n, n).triangularView<Eigen::Lower>().transpose().solveInPlace(alpha);
+}
+
+// Added by Mohit
+void GaussianProcess::update_alpha(const double& lambda)
+{
+    // can previously computed values be used?
+    if (!alpha_needs_update && std::abs(lambda_prev - lambda) <= LAMBDA_CHANGE_THRESHOLD)
+        return;
+    alpha_needs_update = false;
+    alpha.resize(sampleset->size());
+    // Map target values to VectorXd
+    const std::vector<double>& targets = sampleset->y();
+    Eigen::Map<const Eigen::VectorXd> y(&targets[0], sampleset->size());
+    int n = sampleset->size();
+    // compute alpha including the effect of forgetting factor
+    alpha = alpha_with_lambda(L.topLeftCorner(n, n), y, lambda);
+    lambda_prev = lambda;
+}
+
+// Added by Mohit
+Eigen::MatrixXd GaussianProcess::compute_Gamma(const size_t& size, const double& lambda)
+{
+    Eigen::MatrixXd Gamma = Eigen::MatrixXd::Identity(size, size);
+    for (int i = size - 2; i >= 0; i--)
+    {
+        Gamma(i, i) = Gamma(i + 1, i + 1) * lambda;
+    }
+    return Gamma;
+}
+
+// Added by Mohit
+Eigen::VectorXd
+    GaussianProcess::alpha_with_lambda(const Eigen::MatrixXd& L, const Eigen::VectorXd& y, const double& lambda)
+{
+    size_t size = L.rows();
+
+    // Given Ky = LL'; Gamma = GG'
+    // compute the mean as: m = k * inv(L * Gamma * L') * Gamma * y
+    //                      m = k * inv(G' * L') * inv(L * G) * Gamma * y
+    // Compute forgetting factor matrix
+    Eigen::MatrixXd Gamma = compute_Gamma(size, lambda);
+    // target values updated with forgetting factor
+    Eigen::VectorXd y_lambda = Gamma * y;
+
+    // Note that we are reusing/updating variable Gamma for later usage
+    // perform cholesky factorization: Gamma = chol(Gamma)
+    Gamma = Gamma.selfadjointView<Eigen::Lower>().llt().matrixL();
+    // L_lambda = L * G;
+    L_lambda = L.triangularView<Eigen::Lower>() * Gamma;
+
+    // alpha_lambda = inv(L_lambda * G)*y_lambda
+    Eigen::VectorXd alpha_lambda = L_lambda.triangularView<Eigen::Lower>().solve(y_lambda);
+    // alpha_lambda = inv(G' * L_lambda')*alpha_lambda
+    L_lambda.triangularView<Eigen::Lower>().adjoint().solveInPlace(alpha_lambda);
+
+    return alpha_lambda;
 }
 
 void GaussianProcess::add_pattern(const double x[], double y)

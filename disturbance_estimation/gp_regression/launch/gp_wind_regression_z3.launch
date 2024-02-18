@@ -13,7 +13,7 @@
 	<param name="use_gp_initial" type="bool" value="true" /> <!-- Paramter to use LSTM feature by utilizing gp_initial.-->
 	<param name="use_sparse_gp_initial" type="bool" value="false" /> <!-- Paramter to use sparse_gp_initial.-->
 	<param name="sizefactor_sparse_gp_initial" type="double" value="0.7" /> <!-- Paramter to set sizefactor for sparse_gp_initial.-->
-       <param name="lambda" type="double" value="0.8" /> <!-- Paramter to set sizefactor for sparse_gp_initial.-->	
+       <param name="lambda" type="double" value="0.6" /> <!-- Paramter to set sizefactor for sparse_gp_initial.-->	
 	<!-- Load commmon parameters. -->
 	<include file="$(find gp_wind_regression)/launch/common_params.xml" />
 	

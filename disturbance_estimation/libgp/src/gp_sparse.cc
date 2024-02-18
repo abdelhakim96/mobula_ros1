@@ -136,6 +136,47 @@ void SparseGaussianProcess::prior_meanVar(SampleSet* _sampleset)
     Suu.setZero(num_induced_points, num_induced_points);
     // Note that Suu = Kuu - Q.topLeftCorner(n, n) but we purposely set Suu = Q, to be helpful later
     Suu = Q;
+
+    // storing variables for later use before the sampleset gets updated
+    this->Lmm.resize(num_dense_points, num_dense_points);
+    this->Kmu.resize(num_dense_points, num_induced_points);
+    this->ym.resize(num_dense_points);
+
+    Lmm = L.topLeftCorner(num_dense_points, num_dense_points);
+    this->Kmu = Kmu;
+    // Map target values to VectorXd
+    const std::vector<double>& targets = sampleset->y();
+    Eigen::Map<const Eigen::VectorXd> y(&targets[0], num_dense_points);
+    this->ym = y;
+}
+
+void SparseGaussianProcess::prior_meanVar_with_lambda(const double& lambda)
+{
+    // can previously computed values be used?
+    if (std::abs(lambda_prev - lambda) <= LAMBDA_CHANGE_THRESHOLD)
+        return;
+
+    //    size_t num_dense_points = Lmm.rows();
+    size_t num_induced_points = sampleset->size();
+
+    // compute alpha including the effect of forgetting factor
+    Eigen::VectorXd alpha_lambda = alpha_with_lambda(Lmm, ym, lambda);
+
+    // muu = Kmu'*inv(Kmm + Sfm)*fmh = Kmu'*inv(LL')*fmh
+    muu = Kmu.transpose() * alpha_lambda;
+    // alpha to be updated again with muu for prediction
+    alpha_needs_update = true;
+
+    Eigen::MatrixXd Q(num_induced_points, num_induced_points);
+    Eigen::MatrixXd Kmm = (L_lambda * L_lambda.transpose()).triangularView<Eigen::Lower>();
+    // Q = Kmu'inv(Kmm + Sfm)*Kmu = Kmu'inv(LL')*Kmu
+    Q = Kmu.transpose() * (Kmm.selfadjointView<Eigen::Lower>().llt().solve(Kmu));
+
+    Suu.setZero(num_induced_points, num_induced_points);
+    // Note that Suu = Kuu - Q.topLeftCorner(n, n) but we purposely set Suu = Q, to be helpful later
+    Suu = Q;
+
+    lambda_prev = lambda;
 }
 
 std::pair<Eigen::MatrixXd, Eigen::MatrixXd> SparseGaussianProcess::compute_KmmKmu(SampleSet* sampleset_m,
@@ -166,8 +207,21 @@ std::pair<Eigen::MatrixXd, Eigen::MatrixXd> SparseGaussianProcess::compute_KmmKm
     return std::make_pair(Kmm, Kmu);
 }
 
-void SparseGaussianProcess::update_alpha(double lamb )
+void SparseGaussianProcess::update_alpha()
 {
+    // check if forgetting factor approach has been used
+    // This approach resets the lambda_prev, which makes
+    //it recompute alpha when the forgetting factor function is called.
+    //This causes one extra computation.
+    // TODO: find a better approach.
+    std::cout << "lambda_prev = " << lambda_prev << "\n";
+    if (lambda_prev != 0)
+    {
+        std::cout << "resetting alpha_needs_update! \n";
+        alpha_needs_update = true;
+        lambda_prev = 0.0;
+    }
+
     // can previously computed values be used?
     if (!alpha_needs_update)
         return;
@@ -182,6 +236,15 @@ void SparseGaussianProcess::update_alpha(double lamb )
         alpha);  // // Same result with using transpose instead of adjoint. Using adjoint for consistency with libgp
 }
 
+void SparseGaussianProcess::update_alpha(const double& lambda)
+{
+    // update prior mean and variance for the given forgetting factor value
+    prior_meanVar_with_lambda(lambda);
+
+    // finally, update alpha
+    update_alpha();
+}
+
 double SparseGaussianProcess::var(const double x[])
 {
     if (sampleset->empty())
@@ -190,6 +253,26 @@ double SparseGaussianProcess::var(const double x[])
     // Note that the sampleset has been updated to represent inducing points rather than dense points.
     compute();  // This computes L (i.e. Kuu = LL')
     update_alpha();
+    update_k_star(x_star);  // This computes k_star (i.e., k_star_u)
+
+    int n = sampleset->size();
+    // v = inv(L)*k_star
+    Eigen::VectorXd v = L.topLeftCorner(n, n).triangularView<Eigen::Lower>().solve(k_star);
+    // v = inv(L')*v
+    L.topLeftCorner(n, n).triangularView<Eigen::Lower>().transpose().solveInPlace(
+        v);  // Same result with using adjoint instead of transpose.
+    // var_f_star = k_star_star - v'*(Kuu - Suu)*v = k_star_star - v'*(Q)*v
+    return cf->get(x_star, x_star) - v.dot(Suu * v);
+}
+
+double SparseGaussianProcess::var(const double x[], const double& lambda)
+{
+    if (sampleset->empty())
+        return 0;
+    Eigen::Map<const Eigen::VectorXd> x_star(x, input_dim);
+    // Note that the sampleset has been updated to represent inducing points rather than dense points.
+    compute();  // This computes L (i.e. Kuu = LL')
+    update_alpha(lambda);
     update_k_star(x_star);  // This computes k_star (i.e., k_star_u)
 
     int n = sampleset->size();

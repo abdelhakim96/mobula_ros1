@@ -53,22 +53,22 @@ catkin_package(
 )
 
 # Set the location of libgp library
-# set(libgp_BINARY_LOCATION "${CMAKE_BINARY_DIR}/../../libgp/build")
+# set(libgp_BINARY_LOCATION "${CMAKE_BINARY_DIR}/../../libgp_sparse/build")
 
 #set(libgp_BINARY_LOCATION "/home/hakim/catkin_ws/src/mobula_ros1/wind-regression/libgp/build")
 #message(STATUS "libgp_BINARY_LOCATION = ${libgp_BINARY_LOCATION}")
 
 
-set(libgp_BINARY_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/../libgp/build")
+set(libgp_BINARY_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/../libgp_sparse/build")
 message(STATUS "libgp_BINARY_LOCATION = ${libgp_BINARY_LOCATION}")
 
 
 include_directories(
     ${catkin_INCLUDE_DIRS}
     ${PROJECT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../libgp  # Adjust this path
-    ${CMAKE_CURRENT_SOURCE_DIR}/../libgp/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../libgp/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libgp_sparse  # Adjust this path
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libgp_sparse/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libgp_sparse/src
 )
 
 # List of source files

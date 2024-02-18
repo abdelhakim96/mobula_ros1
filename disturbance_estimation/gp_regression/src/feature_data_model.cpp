@@ -121,7 +121,8 @@ FeatureDataStruct FeatureDataModel::computeAndGetFeatureData(const MeasDataStruc
 }
 
 bool FeatureDataModel::setFeatureData(const InputTargetDataStruct& input_target_data)
-{
+{ 
+    /*
     if (input_target_data.input.size() != gp_params_.input_data_params_.num_features_)
     {
         if (run_params_.debug_flag_ >= 0)
@@ -133,7 +134,9 @@ bool FeatureDataModel::setFeatureData(const InputTargetDataStruct& input_target_
 
         }
         return 0;
+        
     }
+    */
     feature_data_.current_time = input_target_data;
     return 1;
 }

@@ -22,9 +22,11 @@ std_msgs::Float64 W2_opt_y;
 std_msgs::Float64 W3_opt_y;
 std_msgs::Float64MultiArray mu_y;
 std_msgs::Float64MultiArray mu_x;
+std_msgs::Float64MultiArray featx;
+std_msgs::Float64MultiArray featy;
 geometry_msgs::Wrench disturbance;
 
-bool is_mu_y_received = false;
+bool is_mu_y_received = true;
 bool traj_on = false;  // Flag to indicate if recording should start
 
 void ref_position_cb(const geometry_msgs::Vector3::ConstPtr& msg) {
@@ -61,7 +63,17 @@ void W3_cb(const std_msgs::Float64::ConstPtr& msg) {
 
 void mu_y_cb(const std_msgs::Float64MultiArray::ConstPtr& msg) {
     mu_y = *msg;
-    is_mu_y_received = !mu_y.data.empty();
+    //is_mu_y_received = !mu_y.data.empty();
+}
+
+
+
+void featx_cb(const std_msgs::Float64MultiArray::ConstPtr& msg) {
+    featx = *msg;
+}
+
+void featy_cb(const std_msgs::Float64MultiArray::ConstPtr& msg) {
+    featy = *msg;
 }
 
 void mu_x_cb(const std_msgs::Float64MultiArray::ConstPtr& msg) {
@@ -73,7 +85,7 @@ void traj_on_cb(const std_msgs::Bool::ConstPtr& msg) {
 }
 
 void write_data_to_file(const ros::TimerEvent& event) {
-    if (!traj_on || !is_mu_y_received || mu_y.data.empty())
+    if (!traj_on )
         return;
 
     if (!print_results.is_open()) {
@@ -115,6 +127,8 @@ void write_data_to_file(const ros::TimerEvent& event) {
         print_results << mu_x.data[i] << ",";
     }
 
+    print_results << featx.data[0] << ",";
+    print_results << featy.data[0] << ",";
     print_results << std::endl;
 }
 
@@ -137,12 +151,16 @@ int main(int argc, char** argv) {
     ros::Subscriber W2_sub = nh.subscribe<std_msgs::Float64>("/W2_opt_y", 1, W2_cb);
     ros::Subscriber W3_sub = nh.subscribe<std_msgs::Float64>("/W3_opt_y", 1, W3_cb);
     ros::Subscriber mu_y_sub = nh.subscribe<std_msgs::Float64MultiArray>("/gp_disturb_reg/mu/y", 1, mu_y_cb);
+    ros::Subscriber featx_sub = nh.subscribe<std_msgs::Float64MultiArray>("/dev/gp/feature_x_filtered", 1, featx_cb);
+    ros::Subscriber featy_sub = nh.subscribe<std_msgs::Float64MultiArray>("/dev/gp/feature_y_filtered", 1, featy_cb);
+
+
     ros::Subscriber mu_x_sub = nh.subscribe<std_msgs::Float64MultiArray>("/gp_disturb_reg/mu/x", 1, mu_x_cb);
     ros::Subscriber disturbance_sub = nh.subscribe<geometry_msgs::Wrench>("/mobula/rov/disturbance", 1, disturbance_cb);
     ros::Subscriber traj_on_sub = nh.subscribe<std_msgs::Bool>("/trajectory_on", 1, traj_on_cb);
 
     ros::Timer data_timer = nh.createTimer(ros::Duration(0.1), write_data_to_file);
-    ros::Timer stop_timer = nh.createTimer(ros::Duration(150.0), stop_recording);
+    ros::Timer stop_timer = nh.createTimer(ros::Duration(100.0), stop_recording);
 
     ros::spin();
 

@@ -55,6 +55,7 @@ public:
     // Overriding functions
     double var(const double x[]) override;
     std::pair<double, double> f_var(const double x[]) override;
+    double var(const double x[], const double& lambda) override;
 
     /** Adds input-output-pair to sampleset and update the SparseGP. If the number of samples is bigger than
      *  the desired maximum points, the SparseGP is re-sparsified and re-computed.
@@ -69,11 +70,19 @@ protected:
     /** Prior covariance matrix for induced points */
     Eigen::MatrixXd Suu;
 
-    void update_alpha(double lamb = 1.0) override;
+    void update_alpha() override;
+
+    /** Update alpha vector utilizing forgetting factor approach.
+     *  @param lambda forgetting factor */
+    void update_alpha(const double& lambda) override;
 
     /** Computes prior mean and variance for induced points
      *  @param _sampleset input sampleset.  */
     virtual void prior_meanVar(SampleSet* _sampleset);
+
+    /** Computes prior mean and variance for induced points utilizing forgetting factor approach.
+     *  @param _lambda forgetting factor.  */
+    virtual void prior_meanVar_with_lambda(const double& lambda);
 
     /** gets the densest point in a list of samples
      *  @param input_dim is the dimensionality of the samples
@@ -85,6 +94,10 @@ protected:
 
 private:
     size_t max_points;
+
+    Eigen::MatrixXd Lmm;
+    Eigen::MatrixXd Kmu;
+    Eigen::VectorXd ym;
 };
 }  // namespace libgp
 
