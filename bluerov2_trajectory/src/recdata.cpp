@@ -1,168 +1,307 @@
-#include <ros/ros.h>
-#include <geometry_msgs/Vector3.h>
-#include <geometry_msgs/Wrench.h>
-#include <std_msgs/Float64.h>
-#include <std_msgs/Float64MultiArray.h>
-#include <nav_msgs/Odometry.h>
-#include <fstream>
-#include <string>
-#include <chrono>
-#include <std_msgs/Bool.h>
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.backends.backend_pdf import PdfPages
 
-std::string file_prefix = "/home/hakim/catkin_ws/src/mobula_ros1/bluerov2_trajectory/test_recordings/recorded_data_brov_";
-std::string file_extension = ".txt";
-std::ofstream print_results;
+plt.close('all')
 
-geometry_msgs::Vector3 ref_position;
-geometry_msgs::Vector3 ref_velocity;
-std_msgs::Float64 ref_yaw;
-nav_msgs::Odometry rov_odometry;
-std_msgs::Float64 W1_opt_y;
-std_msgs::Float64 W2_opt_y;
-std_msgs::Float64 W3_opt_y;
-std_msgs::Float64MultiArray mu_y;
-std_msgs::Float64MultiArray mu_x;
-std_msgs::Float64MultiArray featx;
-std_msgs::Float64MultiArray featy;
-geometry_msgs::Wrench disturbance;
+folder_name = ""
 
-bool is_mu_y_received = true;
-bool traj_on = false;  // Flag to indicate if recording should start
+# Corrected file paths containing the recorded data
+file_name_gp_nogp = os.path.join(folder_name, "nogptest.txt")
+file_name_gp_lambda01 = os.path.join(folder_name, "1test1.txt")
+file_name_gp_lambda01_combined = os.path.join(folder_name, "1test1.txt")
+file_name_gp_lambda8 = os.path.join(folder_name, "0.8test1.txt")
+file_name_gp_lambda8_combined = os.path.join(folder_name, "0.8test1.txt")
+file_name_gp_mac_sine = os.path.join(folder_name, "mactest11.txt")
+file_name_gp_mac_test = os.path.join(folder_name, "mactest11.txt")
+file_name_gp_lambda9_sine = os.path.join(folder_name, "0.5test1.txt")
+file_name_gp_lambda9_test = os.path.join(folder_name, "0.5test1.txt")
+file_name_nogp_test = os.path.join(folder_name, "nogptest.txt")
 
-void ref_position_cb(const geometry_msgs::Vector3::ConstPtr& msg) {
-    ref_position = *msg;
-}
+# Lists to store the trajectory data
+ref_positions_x_gp_nogp = []
+ref_positions_y_gp_nogp = []
+actual_positions_x_gp_nogp = []
+actual_positions_y_gp_nogp = []
 
-void ref_velocity_cb(const geometry_msgs::Vector3::ConstPtr& msg) {
-    ref_velocity = *msg;
-}
+ref_positions_x_gp_nogp_test = []
+ref_positions_y_gp_nogp_test = []
+actual_positions_x_gp_nogp_test = []
+actual_positions_y_gp_nogp_test = []
 
-void disturbance_cb(const geometry_msgs::Wrench::ConstPtr& msg) {
-    disturbance = *msg;
-}
+ref_positions_x_gp_lambda01 = []
+ref_positions_y_gp_lambda01 = []
+actual_positions_x_gp_lambda01 = []
+actual_positions_y_gp_lambda01 = []
 
-void ref_yaw_cb(const std_msgs::Float64::ConstPtr& msg) {
-    ref_yaw = *msg;
-}
+ref_positions_x_gp_lambda01_combined = []
+ref_positions_y_gp_lambda01_combined = []
+actual_positions_x_gp_lambda01_combined = []
+actual_positions_y_gp_lambda01_combined = []
 
-void rov_odometry_cb(const nav_msgs::Odometry::ConstPtr& msg) {
-    rov_odometry = *msg;
-}
+ref_positions_x_gp_lambda8 = []
+ref_positions_y_gp_lambda8 = []
+actual_positions_x_gp_lambda8 = []
+actual_positions_y_gp_lambda8 = []
 
-void W1_cb(const std_msgs::Float64::ConstPtr& msg) {
-    W1_opt_y = *msg;
-}
+ref_positions_x_gp_lambda8_combined = []
+ref_positions_y_gp_lambda8_combined = []
+actual_positions_x_gp_lambda8_combined = []
+actual_positions_y_gp_lambda8_combined = []
 
-void W2_cb(const std_msgs::Float64::ConstPtr& msg) {
-    W2_opt_y = *msg;
-}
+ref_positions_x_gp_mac_sine = []
+ref_positions_y_gp_mac_sine = []
+actual_positions_x_gp_mac_sine = []
+actual_positions_y_gp_mac_sine = []
 
-void W3_cb(const std_msgs::Float64::ConstPtr& msg) {
-    W3_opt_y = *msg;
-}
+ref_positions_x_gp_mac_test = []
+ref_positions_y_gp_mac_test = []
+actual_positions_x_gp_mac_test = []
+actual_positions_y_gp_mac_test = []
 
-void mu_y_cb(const std_msgs::Float64MultiArray::ConstPtr& msg) {
-    mu_y = *msg;
-    //is_mu_y_received = !mu_y.data.empty();
-}
+ref_positions_x_gp_lambda9_sine = []
+ref_positions_y_gp_lambda9_sine = []
+actual_positions_x_gp_lambda9_sine = []
+actual_positions_y_gp_lambda9_sine = []
 
+ref_positions_x_gp_lambda9_test = []
+ref_positions_y_gp_lambda9_test = []
+actual_positions_x_gp_lambda9_test = []
+actual_positions_y_gp_lambda9_test = []
 
-
-void featx_cb(const std_msgs::Float64MultiArray::ConstPtr& msg) {
-    featx = *msg;
-}
-
-void featy_cb(const std_msgs::Float64MultiArray::ConstPtr& msg) {
-    featy = *msg;
-}
-
-void mu_x_cb(const std_msgs::Float64MultiArray::ConstPtr& msg) {
-    mu_x = *msg;
-}
-
-void traj_on_cb(const std_msgs::Bool::ConstPtr& msg) {
-    traj_on = msg->data;
-}
-
-void write_data_to_file(const ros::TimerEvent& event) {
-    if (!traj_on )
-        return;
-
-    if (!print_results.is_open()) {
-        print_results.open(file_prefix + std::to_string(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count()) + file_extension);
-        if (!print_results.is_open()) {
-            ROS_ERROR("Failed to open the file for writing.");
-            return;
-        }
-    }
-
-    double position_error_x = rov_odometry.pose.pose.position.x - ref_position.x;
-    double position_error_y = rov_odometry.pose.pose.position.y - ref_position.y;
-    double position_error_z = rov_odometry.pose.pose.position.z - ref_position.z;
-
-    double velocity_error_x = rov_odometry.twist.twist.linear.x - ref_velocity.x;
-    double velocity_error_y = rov_odometry.twist.twist.linear.y - ref_velocity.y;
-    double velocity_error_z = rov_odometry.twist.twist.linear.z - ref_velocity.z;
-
-    print_results << ref_position.x << "," << ref_position.y << "," << ref_position.z << ",";
-    print_results << rov_odometry.pose.pose.position.x << "," << rov_odometry.pose.pose.position.y << "," << rov_odometry.pose.pose.position.z << ",";
-    print_results << position_error_x << "," << position_error_y << "," << position_error_z << ",";
-
-    print_results << ref_velocity.x << "," << ref_velocity.y << "," << ref_velocity.z << ",";
-    print_results << rov_odometry.twist.twist.linear.x << "," << rov_odometry.twist.twist.linear.y << "," << rov_odometry.twist.twist.linear.z << ",";
-    print_results << velocity_error_x << "," << velocity_error_y << "," << velocity_error_z << ",";
-
-    print_results << ref_yaw.data << ",";
-    print_results << rov_odometry.pose.pose.orientation.z << ",";
-
-    print_results << W1_opt_y.data << "," << W2_opt_y.data << "," << W3_opt_y.data << ",";
-
-    print_results << disturbance.force.x << "," << disturbance.force.y << "," << disturbance.force.z << ",";
-
-    for (size_t i = 0; i < mu_y.data.size(); ++i) {
-        print_results << mu_y.data[i] << ",";
-    }
-
-    for (size_t i = 0; i < mu_x.data.size(); ++i) {
-        print_results << mu_x.data[i] << ",";
-    }
-
-    print_results << featx.data[0] << ",";
-    print_results << featy.data[0] << ",";
-    print_results << std::endl;
-}
-
-void stop_recording(const ros::TimerEvent& event) {
-    if (print_results.is_open()) {
-        print_results.close();
-    }
-    ros::shutdown();
-}
-
-int main(int argc, char** argv) {
-    ros::init(argc, argv, "data_recorder");
-    ros::NodeHandle nh;
-
-    ros::Subscriber ref_pos_sub = nh.subscribe<geometry_msgs::Vector3>("ref_trajectory/position", 1, ref_position_cb);
-    ros::Subscriber ref_vel_sub = nh.subscribe<geometry_msgs::Vector3>("ref_trajectory/velocity", 1, ref_velocity_cb);
-    ros::Subscriber ref_yaw_sub = nh.subscribe<std_msgs::Float64>("ref_trajectory/yaw", 1, ref_yaw_cb);
-    ros::Subscriber rov_odometry_sub = nh.subscribe<nav_msgs::Odometry>("/mobula/rov/odometry", 1, rov_odometry_cb);
-    ros::Subscriber W1_sub = nh.subscribe<std_msgs::Float64>("/W1_opt_y", 1, W1_cb);
-    ros::Subscriber W2_sub = nh.subscribe<std_msgs::Float64>("/W2_opt_y", 1, W2_cb);
-    ros::Subscriber W3_sub = nh.subscribe<std_msgs::Float64>("/W3_opt_y", 1, W3_cb);
-    ros::Subscriber mu_y_sub = nh.subscribe<std_msgs::Float64MultiArray>("/gp_disturb_reg/mu/y", 1, mu_y_cb);
-    ros::Subscriber featx_sub = nh.subscribe<std_msgs::Float64MultiArray>("/dev/gp/feature_x_filtered", 1, featx_cb);
-    ros::Subscriber featy_sub = nh.subscribe<std_msgs::Float64MultiArray>("/dev/gp/feature_y_filtered", 1, featy_cb);
+# Lists to store the trajectory data
+W1 = [] 
+W2 = []
+W3 =[] 
+mu_y =[]
+gt_y =[] 
+gt_y_1 =[] 
 
 
-    ros::Subscriber mu_x_sub = nh.subscribe<std_msgs::Float64MultiArray>("/gp_disturb_reg/mu/x", 1, mu_x_cb);
-    ros::Subscriber disturbance_sub = nh.subscribe<geometry_msgs::Wrench>("/mobula/rov/disturbance", 1, disturbance_cb);
-    ros::Subscriber traj_on_sub = nh.subscribe<std_msgs::Bool>("/trajectory_on", 1, traj_on_cb);
+mu_y_1 =[]
+gt_y_1 =[] 
+mu_y_9 =[]
+gt_y_9 =[] 
+mu_y_8 =[]
+mu_y_mac =[]
+gt_y_8=[] 
 
-    ros::Timer data_timer = nh.createTimer(ros::Duration(0.1), write_data_to_file);
-    ros::Timer stop_timer = nh.createTimer(ros::Duration(100.0), stop_recording);
+gt_y_nogp=[] 
+gt_y_mac =[]
+# Function to read data from a file and populate the lists
+def read_data(file_path, ref_x_list, ref_y_list, actual_x_list, actual_y_list, W1_list, W2_list, W3_list, mu_y_list, gt_y_list):
+    try:
+        with open(file_path, 'r') as file:
+            for line in file:
+                data = line.strip().split(',')
+                ref_x_list.append(float(data[0]))
+                ref_y_list.append(float(data[1]))
+                actual_x_list.append(float(data[3]))
+                actual_y_list.append(float(data[4]))
+                W1_list.append(float(data[20]))
+                W2_list.append(float(data[21]))
+                W3_list.append(float(data[22]))
+                mu_y_list.append(float(data[27]))
+                gt_y_list.append(float(data[24]))
+                
+    except Exception as e:
+        print(f"Error reading data from {file_path}: {e}")
 
-    ros::spin();
 
-    return 0;
-}
+
+
+
+
+# Read data from files
+read_data(file_name_gp_nogp, ref_positions_x_gp_nogp, ref_positions_y_gp_nogp, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, W1, W2, W3, mu_y, gt_y_nogp)
+read_data(file_name_gp_lambda01, ref_positions_x_gp_lambda01, ref_positions_y_gp_lambda01, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, W1, W2, W3, mu_y_1, gt_y_1)
+read_data(file_name_gp_lambda8, ref_positions_x_gp_lambda8, ref_positions_y_gp_lambda8, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, W1, W2, W3, mu_y_8, gt_y_8)
+read_data(file_name_gp_mac_sine, ref_positions_x_gp_mac_sine, ref_positions_y_gp_mac_sine, actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine, W1, W2, W3, mu_y_mac,  gt_y_mac)
+read_data(file_name_gp_lambda9_sine, ref_positions_x_gp_lambda9_sine, ref_positions_y_gp_lambda9_sine, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, W1, W2, W3, mu_y_9, gt_y_9)
+
+
+# Start time and duration parameters
+t_start = 1
+duration = 800
+subset_size= duration
+
+colors = ['#9467bd','#2ca02c', '#d62728', '#1f77b4','#ff7f0e' ]
+
+# Calculate distance from each point in the trajectory to the closest point on the unit circle
+def distance_to_unit_circle_trajectory(x_positions, y_positions):
+    distances = []
+    for x, y in zip(x_positions, y_positions):
+        min_distance = float('inf')
+        for theta in np.linspace(0, 2*np.pi, 1000):
+            unit_x = 1 + np.cos(theta)
+            unit_y = np.sin(theta)
+            distance = np.sqrt((x - unit_x)**2 + (y - unit_y)**2)
+            if distance < min_distance:
+                min_distance = distance
+        distances.append(min_distance)
+    return distances
+
+# Calculate distances for each dataset
+distances_gp_nogp_closest = distance_to_unit_circle_trajectory(actual_positions_x_gp_nogp, actual_positions_y_gp_nogp)
+distances_gp_lambda1_sine_closest = distance_to_unit_circle_trajectory(actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01)
+distances_gp_lambda8_sine_closest = distance_to_unit_circle_trajectory(actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8)
+distances_gp_mac_sine_closest = distance_to_unit_circle_trajectory(actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine)
+distances_gp_lambda9_sine_closest = distance_to_unit_circle_trajectory(actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine)
+
+# Calculate mean distances for each dataset
+mean_distance_gp_nogp_closest = np.mean(distances_gp_nogp_closest[:duration])
+mean_distance_gp_lambda01_sine_closest = np.mean(distances_gp_lambda1_sine_closest[:duration])
+mean_distance_gp_lambda8_sine_closest = np.mean(distances_gp_lambda8_sine_closest[:duration])
+mean_distance_gp_mac_sine_closest = np.mean(distances_gp_mac_sine_closest[:duration])
+mean_distance_gp_lambda9_sine_closest = np.mean(distances_gp_lambda9_sine_closest[:duration])
+
+pdf_file_path = "plots.pdf"
+pdf_pages = PdfPages(pdf_file_path)
+
+
+
+# Plotting the distances
+plt.figure(figsize=(12, 6))
+
+dur = duration 
+t_end = t_start + dur   # Calculate end time
+
+# Plot the distances for each dataset
+skip = 10  # Skip every 10 points
+plt.plot(range(t_start, t_end, skip), distances_gp_nogp_closest[t_start:t_end:skip], linewidth=2,color=colors[4], label=f'No GP (Mean: {mean_distance_gp_nogp_closest:.3g})')
+plt.plot(range(t_start, t_end, skip), distances_gp_lambda1_sine_closest[t_start:t_end:skip], linewidth=2,color=colors[0], label=f'Lambda 1.0 (Mean: {mean_distance_gp_lambda01_sine_closest:.3g})')
+plt.plot(range(t_start, t_end, skip), distances_gp_lambda8_sine_closest[t_start:t_end:skip],linewidth=2, color=colors[1], label=f'Lambda 0.8 (Mean: {mean_distance_gp_lambda8_sine_closest:.3g})')
+plt.plot(range(t_start, t_end, skip), distances_gp_lambda9_sine_closest[t_start:t_end:skip],linewidth=2, color=colors[2], label=f'Lambda 0.5 (Mean: {mean_distance_gp_lambda9_sine_closest:.3g})')
+plt.plot(range(t_start, t_end, skip), distances_gp_mac_sine_closest[t_start:t_end:skip], linewidth=2, color=colors[3], label=f'Ours (Mean: {mean_distance_gp_mac_sine_closest:.3g})')
+# Add labels and title
+plt.xlabel('Time')
+plt.ylabel('Absolute Error')
+plt.title('Error in Trajectory Tracking')
+
+# Add legend
+plt.legend()
+
+
+plt.grid(True)
+pdf_pages.savefig()
+# Plotting Trajectories
+
+# Function to plot trajectories for a subset of data
+def plot_trajectories(ax, actual_x, actual_y, label, t_start, duration, color):
+    ax.plot(actual_x[t_start:t_start + duration], actual_y[t_start:t_start + duration], linewidth=2, label=label, color=color)
+
+# Function to plot gt_y for each method
+def plot_dist(ax, gt_y_values, label, t_start, duration, color):
+    ax.plot(range(t_start, t_start + duration), gt_y_values[t_start:t_start + duration], label=label, color=color)
+
+
+def plot_dist1(ax, gt_y_values, label, t_start, duration, color):
+    ax.plot(range(t_start, t_start + duration), gt_y_values[t_start:t_start + duration], label=label, color=color ,linestyle='--',linewidth=4 )
+
+t1 = 300
+t2= 350
+#t2 = int(duration/2)
+
+#t3 = int(duration-40)
+
+plt.figure(figsize=(10, 10))
+
+plt.subplot(1, 2, 1)  # Subplot 1: First Cycle
+theta = np.linspace(0, 2*np.pi, 100)
+plt.plot(1 + np.cos(theta), np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
+plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t1, t2, color=colors[4])
+plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, 'Lambda = 1.0', t1, t2, color=colors[0])
+plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8',t1, t2, color=colors[1])
+plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t1, t2, color=colors[2])
+plot_trajectories(plt, actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine, 'Ours', t1, t2, color=colors[3])
+plt.legend()
+plt.xlabel('X [m]')
+plt.ylabel('Y [m]')
+plt.title('First Cycle')
+plt.gca().set_aspect('equal', adjustable='box')  # Equal aspect ratio
+
+
+
+
+
+pdf_pages.savefig()
+plt.figure(figsize=(12, 6))
+
+
+
+# Plot gt_y for each method
+#plot_gt_y(plt, gt_y_nogp, 'No GP', t_start, duration, 'blue')
+plot_dist(plt, mu_y_1, 'lambda = 1', t_start, duration  , color=colors[0])
+plot_dist(plt, mu_y_8, 'lambda = 0.8', t_start, duration , color=colors[1])
+plot_dist(plt, mu_y_9, 'lambda = 0.5', t_start, duration, color=colors[2])
+plot_dist(plt, mu_y_mac, ' Ours ', t_start, duration , color=colors[3])
+gt_y_1_scaled = [y / 11.4 for y in gt_y_1]
+
+# Call plot_dist1 with the scaled data
+plot_dist1(plt, gt_y_1_scaled, 'ground truth', t_start, duration, color='black')
+
+
+plt.xlabel('Time')
+plt.ylabel('Disturbance (m/s^2)')
+plt.title('Disturbance Prediction')
+plt.legend()
+plt.grid(True)
+
+pdf_pages.savefig()
+
+def plot_dist1(ax, gt_y_values, mu_y_values, label, t_start, duration, color):
+    abs_error = [abs(gt - mu) for gt, mu in zip(gt_y_values[t_start:t_start + duration], mu_y_values[t_start:t_start + duration])]
+    mean_abs_error = np.mean(abs_error)
+    ax.plot(range(t_start, t_start + duration), abs_error, label=f'{label} (Mean Abs. Error: {mean_abs_error:.3g})', color=color, linestyle='--', linewidth=4)
+
+plt.figure(figsize=(12, 6))
+
+# Define t_start and duration
+t_start = 0
+#duration = 820
+
+# Plot error for different values of lambda
+plot_dist1(plt, gt_y_1_scaled, mu_y_1, 'Lambda = 1', t_start, duration, color=colors[0])
+plot_dist1(plt, gt_y_1_scaled, mu_y_8, 'Lambda = 0.8', t_start, duration, color=colors[1])
+plot_dist1(plt, gt_y_1_scaled, mu_y_9, 'Lambda = 0.5', t_start, duration, color=colors[2])
+plot_dist1(plt, gt_y_1_scaled, mu_y_mac, 'Ours', t_start, duration, color=colors[3])
+
+# Add legend
+plt.legend()
+# Show plot
+
+
+plt.xlabel('Time')
+plt.ylabel('Absolute Error ')
+plt.title('Error in Prediction')
+plt.legend()
+plt.grid(True)
+
+
+pdf_pages.savefig()
+
+# Plotting the weights
+plt.figure(figsize=(12, 6))
+
+# Plot the weights for the "macgp" method
+plt.plot(range(t_start, t_end, skip), W1[t_start:t_end:skip], linewidth=2, label='W1', color='red')
+plt.plot(range(t_start, t_end, skip), W2[t_start:t_end:skip], linewidth=2, label='W2', color='green')
+plt.plot(range(t_start, t_end, skip), W3[t_start:t_end:skip], linewidth=2, label='W3', color='blue')
+
+# Add labels and title
+plt.xlabel('Time')
+plt.ylabel('Weight Value')
+plt.title('Weights for MACGP Method')
+
+# Add legend
+plt.legend()
+
+plt.grid(True)
+pdf_pages.savefig()
+
+plt.show()
+
+
+
+print("PDF saved successfully.")

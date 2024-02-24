@@ -53,7 +53,7 @@ catkin_package(
 )
 
 # Set the location of libgp library
-# set(libgp_BINARY_LOCATION "${CMAKE_BINARY_DIR}/../../libgp_sparse/build")
+# set(libgp_BINARY_LOCATION "${CMAKE_BINARY_DIR}/../../libgp/build")
 
 #set(libgp_BINARY_LOCATION "/home/hakim/catkin_ws/src/mobula_ros1/wind-regression/libgp/build")
 #message(STATUS "libgp_BINARY_LOCATION = ${libgp_BINARY_LOCATION}")
