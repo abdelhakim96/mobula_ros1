@@ -9,16 +9,16 @@ folder_name = ""
 
 # Corrected file paths containing the recorded data
 
-file_name_gp_nogp = os.path.join(folder_name, "nogptest.txt")
-file_name_gp_lambda01 = os.path.join(folder_name, "1test1.txt")
-file_name_gp_lambda01_combined = os.path.join(folder_name, "1test1.txt")
-file_name_gp_lambda8 = os.path.join(folder_name, "0.8test1.txt")
-file_name_gp_lambda8_combined = os.path.join(folder_name, "0.8test1.txt")
-file_name_gp_mac_sine = os.path.join(folder_name, "mactest11.txt")
-file_name_gp_mac_test = os.path.join(folder_name, "mactest11.txt")
+file_name_gp_nogp = os.path.join(folder_name, "0.8test1.txt")
+file_name_gp_lambda01 = os.path.join(folder_name, "test11.txt")
+file_name_gp_lambda01_combined = os.path.join(folder_name, "test11.txt")
+file_name_gp_lambda8 = os.path.join(folder_name, "test1_0.8.txt")
+file_name_gp_lambda8_combined = os.path.join(folder_name, "test1_0.8.txt")
+file_name_gp_mac_sine = os.path.join(folder_name, "test1.txt")
+file_name_gp_mac_test = os.path.join(folder_name, "test1.txt")
 file_name_gp_lambda9_sine = os.path.join(folder_name, "0.5test1.txt")
 file_name_gp_lambda9_test = os.path.join(folder_name, "0.5test1.txt")
-file_name_nogp_test = os.path.join(folder_name, "nogptest.txt")
+file_name_nogp_test = os.path.join(folder_name, "0.8test1.txt")
 
 # Lists to store the trajectory data
 ref_positions_x_gp_nogp = []
@@ -122,7 +122,7 @@ read_data(file_name_gp_lambda9_sine, ref_positions_x_gp_lambda9_sine, ref_positi
 
 # Start time and duration parameters
 t_start = 120
-duration = 730
+duration = 580
 subset_size= duration
 
 colors = ['#a1cb58','#e7c550',  '#1252cf',  '#6E091A','#F7A400', ]
@@ -199,7 +199,7 @@ def plot_dist1(ax, gt_y_values, label, t_start, duration, color):
 
 t1 = 200
 t2= 325
-t3 = 650
+t3 = 500
 
 #t3 = int(duration-40)
 

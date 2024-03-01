@@ -355,9 +355,16 @@ int main(int argc, char** argv)
             if (std::fmod(std::abs(t_cc_loop - (int)(t_cc_loop)), (double)(sampleTime)) == 0)
                 std::cout << "loop time for outer NMPC: " << t_cc_loop << " (sec)"
                           << "\n";
+          //  if (M_PI<angles.at(2) < 2 * M_PI)
+           // {
+           //   angles.at(2) = angles.at(2) - 2 * M_PI;
 
+
+            //}
             // Setting up state-feedback [x,y,z,u,v,w,psi,r]
-            current_states = {current_pos_att.at(0),
+          //  current_states = {current_pos_att.at(0)-6376979,
+           //                   current_pos_att.at(1)-1673713.7,
+              current_states = {current_pos_att.at(0),
                               current_pos_att.at(1),
                               current_pos_att.at(2),
                               current_vel_rate.at(0),
