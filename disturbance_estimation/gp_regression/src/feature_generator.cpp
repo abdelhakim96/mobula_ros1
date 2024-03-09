@@ -20,7 +20,7 @@ double Fz_dist;
  
 // BlueROV2 Model Parameters
 const double f_s = 1.0;    //scaling factor;
-const double m = 11.4;    // BlueROV2 mass (kg)  
+const double m = 13.4;    // BlueROV2 mass (kg)  
 const double g = 9.82;  // gravitational field strength (m/s^2)
 const double F_bouy = 114.8; // Buoyancy force (N)
  

@@ -9,16 +9,16 @@ folder_name = ""
 
 # Corrected file paths containing the recorded data
 
-file_name_gp_nogp = os.path.join(folder_name, "0.8test1.txt")
-file_name_gp_lambda01 = os.path.join(folder_name, "test11.txt")
-file_name_gp_lambda01_combined = os.path.join(folder_name, "test11.txt")
-file_name_gp_lambda8 = os.path.join(folder_name, "test1_0.8.txt")
-file_name_gp_lambda8_combined = os.path.join(folder_name, "test1_0.8.txt")
-file_name_gp_mac_sine = os.path.join(folder_name, "test1.txt")
-file_name_gp_mac_test = os.path.join(folder_name, "test1.txt")
-file_name_gp_lambda9_sine = os.path.join(folder_name, "0.5test1.txt")
-file_name_gp_lambda9_test = os.path.join(folder_name, "0.5test1.txt")
-file_name_nogp_test = os.path.join(folder_name, "0.8test1.txt")
+file_name_gp_nogp = os.path.join(folder_name, "real_nogp.txt")
+file_name_gp_lambda01 = os.path.join(folder_name, "real_gp1.txt")
+file_name_gp_lambda01_combined = os.path.join(folder_name, "treal_gp1.txt")
+file_name_gp_lambda8 = os.path.join(folder_name, "real_gp8.txt")
+file_name_gp_lambda8_combined = os.path.join(folder_name, "real_gp8.txt")
+file_name_gp_mac_sine = os.path.join(folder_name, "real_dfgp.txt")
+file_name_gp_mac_test = os.path.join(folder_name, "real_dfgp.txt")
+file_name_gp_lambda9_sine = os.path.join(folder_name, "real_gp5.txt")
+file_name_gp_lambda9_test = os.path.join(folder_name, "real_gp5.txt")
+file_name_nogp_test = os.path.join(folder_name, "real_nogp.txt.txt")
 
 # Lists to store the trajectory data
 ref_positions_x_gp_nogp = []
@@ -108,7 +108,7 @@ def read_data(file_path, ref_x_list, ref_y_list, actual_x_list, actual_y_list, W
                 W2_list.append(float(data[21]))
                 W3_list.append(float(data[22]))
                 mu_y_list.append(float(data[27]))
-                gt_y_list.append(float(data[24]))
+                gt_y_list.append(float(data[28]))
                 
     except Exception as e:
         print(f"Error reading data from {file_path}: {e}")
@@ -169,8 +169,8 @@ t_end = t_start + dur   # Calculate end time
 skip = 10  # Skip every 10 points
 plt.plot(np.array(range(t_start, t_end, skip))/10, distances_gp_nogp_closest[t_start:t_end:skip], linewidth=2,color=colors[4], label=f'No GP (Mean: {mean_distance_gp_nogp_closest:.3g})')
 plt.plot(np.array(range(t_start, t_end, skip))/10, distances_gp_lambda1_sine_closest[t_start:t_end:skip], linewidth=2,color=colors[0], label=f'Lambda 1.0 (Mean: {mean_distance_gp_lambda01_sine_closest:.3g})')
-plt.plot(np.array(range(t_start, t_end, skip))/10, distances_gp_lambda8_sine_closest[t_start:t_end:skip],linewidth=2, color=colors[1], label=f'Lambda 0.8 (Mean: {mean_distance_gp_lambda8_sine_closest:.3g})')
-plt.plot(np.array(range(t_start, t_end, skip))/10, distances_gp_lambda9_sine_closest[t_start:t_end:skip],linewidth=2, color=colors[2], label=f'Lambda 0.5 (Mean: {mean_distance_gp_lambda9_sine_closest:.3g})')
+#plt.plot(np.array(range(t_start, t_end, skip))/10, distances_gp_lambda8_sine_closest[t_start:t_end:skip],linewidth=2, color=colors[1], label=f'Lambda 0.8 (Mean: {mean_distance_gp_lambda8_sine_closest:.3g})')
+#plt.plot(np.array(range(t_start, t_end, skip))/10, distances_gp_lambda9_sine_closest[t_start:t_end:skip],linewidth=2, color=colors[2], label=f'Lambda 0.5 (Mean: {mean_distance_gp_lambda9_sine_closest:.3g})')
 plt.plot(np.array(range(t_start, t_end, skip))/10, distances_gp_mac_sine_closest[t_start:t_end:skip], linewidth=2, color=colors[3], label=f'Ours (Mean: {mean_distance_gp_mac_sine_closest:.3g})')
 
 # Add labels and title
@@ -207,11 +207,11 @@ plt.figure(figsize=(15, 10))
 
 plt.subplot(1, 2, 1)  # Subplot 1: First Cycle
 theta = np.linspace(0, 2*np.pi, 100)
-plt.plot(1 + np.cos(theta), np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
+#plt.plot(1 + np.cos(theta), np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
 plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t1, t2, color=colors[4])
 plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, 'Lambda = 1.0', t1, t2, color=colors[0])
-plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8',t1, t2, color=colors[1])
-plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t1, t2, color=colors[2])
+#plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8',t1, t2, color=colors[1])
+#plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t1, t2, color=colors[2])
 plot_trajectories(plt, actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine, 'Ours', t1, t2, color=colors[3])
 plt.legend(fontsize=20)
 plt.xlabel('X [m]', fontsize=20)
@@ -223,11 +223,11 @@ t2= t1+t2
 t3= 325
 
 plt.subplot(1, 2, 2)  # Subplot 2: Second Cycle
-plt.plot(1 + np.cos(theta), np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
+#plt.plot(1 + np.cos(theta), np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
 plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t2, t3, color=colors[4])
 plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, 'Lambda = 1.0', t2, t3, color=colors[0])
-plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8', t2, t3, color=colors[1])
-plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t2, t3, color=colors[2])
+#plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8', t2, t3, color=colors[1])
+#plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t2, t3, color=colors[2])
 plot_trajectories(plt, actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine, 'Ours', t2, t3, color=colors[3])
 plt.legend(fontsize=20)
 plt.xlabel('X [m]', fontsize=20)
@@ -249,10 +249,10 @@ plt.figure(figsize=(15, 10))
 
 # Plot gt_y for each method
 plot_dist(plt, mu_y_1, 'lambda = 1', t_start, duration  , color=colors[0])
-plot_dist(plt, mu_y_8, 'lambda = 0.8', t_start, duration , color=colors[1])
-plot_dist(plt, mu_y_9, 'lambda = 0.5', t_start, duration, color=colors[2])
+#plot_dist(plt, mu_y_8, 'lambda = 0.8', t_start, duration , color=colors[1])
+#plot_dist(plt, mu_y_9, 'lambda = 0.5', t_start, duration, color=colors[2])
 plot_dist(plt, mu_y_mac, ' Ours ', t_start, duration, color=colors[3])
-gt_y_1_scaled = [y / 11.4 for y in gt_y_1]
+gt_y_1_scaled = [y / 1 for y in gt_y_1]
 
 # Call plot_dist1 with the scaled data
 plot_dist1(plt, gt_y_1_scaled, 'ground truth', t_start, duration, color='black')
@@ -278,9 +278,9 @@ t_start = 0
 
 # Plot error for different values of lambda
 plot_dist1(plt, gt_y_1_scaled, mu_y_1, 'Lambda = 1', t_start, duration, color=colors[0])
-plot_dist1(plt, gt_y_1_scaled, mu_y_8, 'Lambda = 0.8', t_start, duration, color=colors[1])
-plot_dist1(plt, gt_y_1_scaled, mu_y_9, 'Lambda = 0.5', t_start, duration, color=colors[2])
-plot_dist1(plt, gt_y_1_scaled, mu_y_mac, 'Ours', t_start, duration, color=colors[3])
+#plot_dist1(plt, gt_y_1_scaled, mu_y_8, 'Lambda = 0.8', t_start, duration, color=colors[1])
+#plot_dist1(plt, gt_y_1_scaled, mu_y_9, 'Lambda = 0.5', t_start, duration, color=colors[2])
+plot_dist1(plt, gt_y_mac, mu_y_mac, 'Ours', t_start, duration, color=colors[3])
 
 # Add legend
 plt.legend(fontsize=20)

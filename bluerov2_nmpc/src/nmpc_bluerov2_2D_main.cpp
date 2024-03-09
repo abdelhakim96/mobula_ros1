@@ -294,7 +294,7 @@ int main(int argc, char** argv)
     dist_Fz.data_zeros.resize(NMPC_N + 1, 0.0);
 
     ref_traj_type = 0;
-    ref_position << 0, 0, 0;
+    ref_position << 0.0, 0.0, 0;
     ref_velocity << 0, 0, 0;
 
      angles = { 0,0,0};
@@ -362,8 +362,8 @@ int main(int argc, char** argv)
 
             //}
             // Setting up state-feedback [x,y,z,u,v,w,psi,r]
-           current_states = {current_pos_att.at(0)-6376979,
-                              current_pos_att.at(1)-1673713.7,
+           current_states = {current_pos_att.at(0),
+                              current_pos_att.at(1),
                               current_pos_att.at(2),
                               current_vel_rate.at(0),
                               current_vel_rate.at(1),

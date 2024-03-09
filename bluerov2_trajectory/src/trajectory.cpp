@@ -165,11 +165,11 @@ int main(int argc, char** argv)
                double d_theta_2 = 2 * absvel * sampleTime * radius + d_theta;
 
                ref_traj_msg.x = radius + wp_x - radius * cos (d_theta);
-               ref_traj_msg.y = wp_x + radius * sin (d_theta);
+               ref_traj_msg.y = wp_y + radius * sin (d_theta);
                ref_traj_msg.z = wp_z;      
                
 
-               double p_x1 =  wp_x - radius * cos (d_theta);
+               double p_x1 =  wp_x - radius * cos (d_theta) ;
                double p_x2 = wp_x - radius * cos (d_theta_2);
 
                double p_y1 = wp_x - radius * sin (d_theta);
