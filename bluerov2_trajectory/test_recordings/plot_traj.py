@@ -9,16 +9,16 @@ folder_name = ""
 
 # Corrected file paths containing the recorded data
 
-file_name_gp_nogp = os.path.join(folder_name, "0.8test1.txt")
-file_name_gp_lambda01 = os.path.join(folder_name, "test11.txt")
-file_name_gp_lambda01_combined = os.path.join(folder_name, "test11.txt")
-file_name_gp_lambda8 = os.path.join(folder_name, "test1_0.8.txt")
-file_name_gp_lambda8_combined = os.path.join(folder_name, "test1_0.8.txt")
-file_name_gp_mac_sine = os.path.join(folder_name, "test1.txt")
-file_name_gp_mac_test = os.path.join(folder_name, "test1.txt")
-file_name_gp_lambda9_sine = os.path.join(folder_name, "0.5test1.txt")
-file_name_gp_lambda9_test = os.path.join(folder_name, "0.5test1.txt")
-file_name_nogp_test = os.path.join(folder_name, "0.8test1.txt")
+file_name_gp_nogp = os.path.join(folder_name, "newsim_nogp2.txt")
+file_name_gp_lambda01 = os.path.join(folder_name, "newsim_gp12.txt")
+file_name_gp_lambda01_combined = os.path.join(folder_name, "newsim_gp12.txt")
+file_name_gp_lambda8 = os.path.join(folder_name, "newsim_gp82.txt")
+file_name_gp_lambda8_combined = os.path.join(folder_name, "newsim_gp82.txt")
+file_name_gp_mac_sine = os.path.join(folder_name, "newsim_dfgp4.txt")
+file_name_gp_mac_test = os.path.join(folder_name, "newsim_dfgp4.txt")
+file_name_gp_lambda9_sine = os.path.join(folder_name, "newsim_gp61.txt")
+file_name_gp_lambda9_test = os.path.join(folder_name, "newsim_gp61.txt")
+file_name_nogp_test = os.path.join(folder_name, "newsim_nogp2.txt")
 
 # Lists to store the trajectory data
 ref_positions_x_gp_nogp = []
@@ -122,7 +122,7 @@ read_data(file_name_gp_lambda9_sine, ref_positions_x_gp_lambda9_sine, ref_positi
 
 # Start time and duration parameters
 t_start = 120
-duration = 580
+duration = 680
 subset_size= duration
 
 colors = ['#a1cb58','#e7c550',  '#1252cf',  '#6E091A','#F7A400', ]
@@ -133,8 +133,8 @@ def distance_to_unit_circle_trajectory(x_positions, y_positions):
     for x, y in zip(x_positions, y_positions):
         min_distance = float('inf')
         for theta in np.linspace(0, 2*np.pi, 1000):
-            unit_x = 1 + np.cos(theta)
-            unit_y = np.sin(theta)
+            unit_x = 1.0 + 1.0*np.cos(theta)
+            unit_y = 1.0*np.sin(theta)
             distance = np.sqrt((x - unit_x)**2 + (y - unit_y)**2)
             if distance < min_distance:
                 min_distance = distance
@@ -207,7 +207,7 @@ plt.figure(figsize=(15, 10))
 
 plt.subplot(1, 2, 1)  # Subplot 1: First Cycle
 theta = np.linspace(0, 2*np.pi, 100)
-plt.plot(1 + np.cos(theta), np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
+plt.plot(1.0 + 1.0*np.cos(theta), 1.0*np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
 plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t1, t2, color=colors[4])
 plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, 'Lambda = 1.0', t1, t2, color=colors[0])
 plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8',t1, t2, color=colors[1])
@@ -223,7 +223,7 @@ t2= t1+t2
 t3= 325
 
 plt.subplot(1, 2, 2)  # Subplot 2: Second Cycle
-plt.plot(1 + np.cos(theta), np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
+plt.plot(1.0 + 1.0*np.cos(theta), 1.0*np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
 plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t2, t3, color=colors[4])
 plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, 'Lambda = 1.0', t2, t3, color=colors[0])
 plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8', t2, t3, color=colors[1])

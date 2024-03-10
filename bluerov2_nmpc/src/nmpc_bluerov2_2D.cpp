@@ -249,9 +249,9 @@ void NMPC_PC::set_measurements(struct acado_struct& acadostruct,
         //acadostruct.od[(i * acadostruct.acado_NOD) + ref_idx++] = online_data.distFx[i] *  (double(acadostruct.acado_N -i)/acadostruct.acado_N );
         //acadostruct.od[(i * acadostruct.acado_NOD) + ref_idx++] = online_data.distFy[i] * (double(acadostruct.acado_N -i)/acadostruct.acado_N );
         //acadostruct.od[(i * acadostruct.acado_NOD) + ref_idx++] = online_data.distFz[i] * (double(acadostruct.acado_N -i)/acadostruct.acado_N );
-        acadostruct.od[(i * acadostruct.acado_NOD) + ref_idx++] = online_data.distFx[i] ;
-        acadostruct.od[(i * acadostruct.acado_NOD) + ref_idx++] = online_data.distFy[i] ;
-        acadostruct.od[(i * acadostruct.acado_NOD) + ref_idx++] = online_data.distFz[i] ;
+        acadostruct.od[(i * acadostruct.acado_NOD) + ref_idx++] = online_data.distFx[0] ;
+        acadostruct.od[(i * acadostruct.acado_NOD) + ref_idx++] = online_data.distFy[0] ;
+        acadostruct.od[(i * acadostruct.acado_NOD) + ref_idx++] = online_data.distFz[0] ;
 
         //for (int idx = 0; idx < statesmeas.size() - acadostruct.acado_NX; idx++)
        // {
