@@ -6,16 +6,19 @@ import numpy as np
 folder_name = ""
 
 # Define file paths for the recorded data
-file_name_test1 = os.path.join(folder_name, "real_gp8_t3.txt")
-file_name_test2 = os.path.join(folder_name, "real_dfgp_t4.txt")
-file_name_test3 = os.path.join(folder_name, "real_nogp_t4.txt")
+file_names = [
+    "real_gp8_t3.txt",
+    "real_dfgp_t4.txt",
+    "real_nogp_t4.txt",
+    "real_gp5_t3.txt",
+    "real_gp5_t3.txt"
+]
+
+# Define plot duration (number of points to plot)
+plot_duration = 700
 
 # Lists to store trajectory data for each file
-trajectory_data = {
-    "test1": {"ref_x": [], "ref_y": [], "actual_x": [], "actual_y": []},
-    "test2": {"ref_x": [], "ref_y": [], "actual_x": [], "actual_y": []},
-    "test3": {"ref_x": [], "ref_y": [], "actual_x": [], "actual_y": []}
-}
+trajectory_data = {}
 
 # Function to read data from a file and populate the lists
 def read_data(file_path, data_dict):
@@ -31,9 +34,9 @@ def read_data(file_path, data_dict):
         print(f"Error reading data from {file_path}: {e}")
 
 # Read data from each test file
-read_data(file_name_test1, trajectory_data["test1"])
-read_data(file_name_test2, trajectory_data["test2"])
-read_data(file_name_test3, trajectory_data["test3"])
+for idx, file_name in enumerate(file_names, start=1):
+    trajectory_data[f"test{idx}"] = {"ref_x": [], "ref_y": [], "actual_x": [], "actual_y": []}
+    read_data(os.path.join(folder_name, file_name), trajectory_data[f"test{idx}"])
 
 # Calculate error for each file
 errors = {}
@@ -47,13 +50,14 @@ mean_errors = {test: np.mean(error_list) for test, error_list in errors.items()}
 plt.figure(figsize=(10, 6))
 
 # Plot reference trajectories
-plt.plot(trajectory_data["test2"]["ref_x"][:300], trajectory_data["test2"]["ref_y"][:300], label='Reference Trajectory (File 2)', linestyle='--', color='black')
-plt.plot(trajectory_data["test3"]["ref_x"][:300], trajectory_data["test3"]["ref_y"][:300], label='Reference Trajectory (File 3)', linestyle='--', color='orange')
+for idx, test in enumerate(trajectory_data.keys(), start=1):
+    plt.plot(trajectory_data[test]["ref_x"][:plot_duration], trajectory_data[test]["ref_y"][:plot_duration], label=f'Reference Trajectory', linestyle='--')
 
 # Plot actual trajectories (first 300 points only)
-plt.plot(np.array(trajectory_data["test1"]["actual_x"][:300])-0.2, trajectory_data["test1"]["actual_y"][:300], label='NO GP', color='blue')
-plt.plot(trajectory_data["test2"]["actual_x"][:300], trajectory_data["test2"]["actual_y"][:300], label='Ours', color='red')
-plt.plot(trajectory_data["test3"]["actual_x"][:300], trajectory_data["test3"]["actual_y"][:300], label='lambda=1', color='green')
+colors = ['blue', 'red', 'green', 'orange', 'purple']
+labels = ['Lambda = 0.8', 'DFGP', 'NOGP', 'Lambda = 1', 'Lambda = 0.5']
+for idx, test in enumerate(trajectory_data.keys(), start=1):
+    plt.plot(trajectory_data[test]["actual_x"][:plot_duration], trajectory_data[test]["actual_y"][:plot_duration], label=labels[idx-1], color=colors[idx-1])
 
 plt.xlabel('X')
 plt.ylabel('Y')
@@ -70,8 +74,8 @@ plt.show()
 # Plot errors for each file
 plt.figure(figsize=(10, 6))
 
-for test, error_list in errors.items():
-    plt.plot(error_list[:300], label=f'{test} Mean Error: {mean_errors[test]:.4f}')
+for idx, (test, error_list) in enumerate(errors.items(), start=1):
+    plt.plot(error_list[:plot_duration], label=f'{labels[idx-1]} Mean Error: {mean_errors[test]:.4f}', color=colors[idx-1])
 
 plt.xlabel('Time')
 plt.ylabel('Error')
