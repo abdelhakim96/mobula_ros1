@@ -20,7 +20,7 @@ double Fz_dist;
  
 // BlueROV2 Model Parameters
 const double f_s = 1.0;    //scaling factor;
-const double m = 11.4;    // BlueROV2 mass (kg)  
+const double m = 13.4;    // BlueROV2 mass (kg)  
 const double g = 9.82;  // gravitational field strength (m/s^2)
 const double F_bouy = 114.8; // Buoyancy force (N)
  
@@ -93,7 +93,7 @@ public:
   // Callback function for acceleration data
   void accCallback(const geometry_msgs::Vector3Stamped::ConstPtr& msg) {
     // Access the trajectory data from the received message
-    acceleration = {msg->vector.x, msg->vector.y, msg->vector.z};
+    acceleration = {msg->vector.x -0.15 , msg->vector.y + 0.15 , msg->vector.z};
  
     // Calculate moving mean of acceleration
     acceleration_buffer.push_back(acceleration);
@@ -151,15 +151,15 @@ int main(int argc, char **argv) {
     // Calculate Fx_dist, Fy_dist, Fz_dist using the filtered acceleration data
     //std::cout << "yaw rate: " << velocity[5]<<std::endl;
     Fx_dist = (m - X_ud) * acceleration[0] - (control[0] +
-     (m * velocity[1] -Y_vd * velocity[1]) * velocity[5] +
-      (X_u + X_uc * sqrt(velocity[0] * velocity[0])) * velocity[0]);
+     (m * velocity[1] -Y_vd * velocity[1]) * -velocity[5] +
+      (X_u + X_uc * sqrt(velocity[0] * velocity[0])+0.000001) * velocity[0]);
 
     Fx_dist = Fx_dist/m; 
  
     Fy_dist = (m - Y_vd) * acceleration[1] -
     (control[1] -
-     (m * velocity[0] - X_ud * velocity[0]) * velocity[5] +
-     (Y_v + Y_vc * sqrt(velocity[1] * velocity[1])) * velocity[1]);
+     (m * velocity[0] - X_ud * velocity[0]) * -velocity[5] +
+     (Y_v + Y_vc * sqrt(velocity[1] * velocity[1])+0.000001) * velocity[1]);
  
     
     Fy_dist = Fy_dist/m; 
@@ -179,19 +179,24 @@ int main(int argc, char **argv) {
  
     // Populate message data
     gp_x_features_msg.data.push_back(Fx_dist);
-    gp_x_features_msg.data.push_back(Fx_dist);
     //gp_x_features_msg.data.push_back(position[0]);
+    //gp_x_features_msg.data.push_back(position[0]);
+    gp_x_features_msg.data.push_back(velocity[1]);
+
     gp_x_features_msg.data.push_back(velocity[0]);
     gp_x_features_msg.data.push_back(control[0]);
  
     gp_y_features_msg.data.push_back(Fy_dist);
-    gp_y_features_msg.data.push_back(Fy_dist);
+   // gp_y_features_msg.data.push_back(position[1]);
+    gp_y_features_msg.data.push_back(velocity[0]);
     //gp_y_features_msg.data.push_back(position[1]);
     gp_y_features_msg.data.push_back(velocity[1]);
     gp_y_features_msg.data.push_back(control[1]);
  
     gp_z_features_msg.data.push_back(Fz_dist);
     gp_z_features_msg.data.push_back(Fz_dist);
+    //gp_z_features_msg.data.push_back(velocity[0]);
+
     //gp_z_features_msg.data.push_back(position[2]);
     gp_z_features_msg.data.push_back(velocity[2]);
     gp_z_features_msg.data.push_back(control[2]);
