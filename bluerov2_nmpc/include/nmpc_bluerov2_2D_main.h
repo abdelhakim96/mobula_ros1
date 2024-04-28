@@ -1,53 +1,55 @@
 #ifndef _NMPC_PC_MAIN_H
 #define _NMPC_PC_MAIN_H
 
-#include <ros/ros.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <mavros_msgs/State.h>
+#include "rclcpp/rclcpp.hpp"
+#include "tf2/LinearMath/Quaternion.h>
+#include "tf2/LinearMath/Matrix3x3.h>
+
+#include "std_msgs/msg/Bool.h>
+#include "std_msgs/msg/Float64.h>
+#include "std_msgs/msg/Float64MultiArray.h>
+#include "geometry_msgs/msg/Wrench.h>
+#include "geometry_msgs/msg/PoseStamped.h"
+#include "geometry_msgs/msg/TwistStamped.h"
+#include <geometry_msgs/msg/Vector3Stamped.h>
+#include "nav_msgs/msg/Odometry.h> 
+#include "mavros_msgs/msg/State.h"
+#include "mavros_msgs/msg/Thrust.h>
+
+#include "nmpc_bluerov2_2D.h>
 
 
-// #include<mavros_msgs/ExtendedState.h>
-#include <std_msgs/Bool.h>
-#include <std_msgs/Float64.h>
-#include <std_msgs/Float64MultiArray.h>
-#include <mavros_msgs/Thrust.h>
-#include <tf/tf.h>
-#include <nav_msgs/Odometry.h> 
-#include <nmpc_bluerov2_2D.h>
-#include <geometry_msgs/Wrench.h>
-
-
-#include <geometry_msgs/Vector3Stamped.h>
 // Subscribers
-ros::Subscriber state_sub;
-
-ros::Subscriber ref_position_sub;
-ros::Subscriber ref_velocity_sub;
-ros::Subscriber ref_yaw_sub;
-ros::Subscriber ref_point_sub;
-ros::Subscriber pos_sub;
-ros::Subscriber vel_sub;
-ros::Subscriber dist_Fx_predInit_sub;
-ros::Subscriber dist_Fy_predInit_sub;
-ros::Subscriber dist_Fz_predInit_sub;
-ros::Subscriber dist_Fx_data_sub;
-ros::Subscriber dist_Fy_data_sub;
-ros::Subscriber dist_Fz_data_sub;
-ros::Subscriber orientation_sub;
+rclcpp::Subscriber state_sub;
+rclcpp::Subscriber ref_position_sub;
+rclcpp::Subscriber ref_velocity_sub;
+rclcpp::Subscriber ref_yaw_sub;
+rclcpp::Subscriber ref_point_sub;
+rclcpp::Subscriber pos_sub;
+rclcpp::Subscriber vel_sub;
+rclcpp::Subscriber dist_Fx_predInit_sub;
+rclcpp::Subscriber dist_Fy_predInit_sub;
+rclcpp::Subscriber dist_Fz_predInit_sub;
+rclcpp::Subscriber dist_Fx_data_sub;
+rclcpp::Subscriber dist_Fy_data_sub;
+rclcpp::Subscriber dist_Fz_data_sub;
+rclcpp::Subscriber orientation_sub;
 
 
 // Publishers
-ros::Publisher att_throttle_pub;
-ros::Publisher attitude_pub;
-ros::Publisher nmpc_cmd_wrench_pub;
-ros::Publisher nmpc_cmd_Fz_pub;
-ros::Publisher nmpc_cmd_exeTime_pub;
-ros::Publisher nmpc_cmd_kkt_pub;
-ros::Publisher nmpc_cmd_obj_pub;
-ros::Publisher nmpc_ctrl_pub;
-ros::Publisher s_sdot_pub;
-ros::Publisher nmpc_pred_traj_pub;
+rclcpp::Publisher att_throttle_pub;
+rclcpp::Publisher attitude_pub;
+rclcpp::Publisher nmpc_cmd_wrench_pub;
+rclcpp::Publisher nmpc_cmd_Fz_pub;
+rclcpp::Publisher nmpc_cmd_exeTime_pub;
+rclcpp::Publisher nmpc_cmd_kkt_pub;
+rclcpp::Publisher nmpc_cmd_obj_pub;
+rclcpp::Publisher nmpc_ctrl_pub;
+rclcpp::Publisher s_sdot_pub;
+rclcpp::Publisher nmpc_pred_traj_pub;
+
+
+// State variables
 nmpc_struct_ nmpc_struct;
 online_data_struct_ online_data;
 
@@ -72,8 +74,8 @@ std::vector<double> angles_d;
 
 double t, t_cc_loop;
 
-tf::Quaternion current_att_quat;
-tf::Matrix3x3 current_att_mat;
+tf2::Quaternion current_att_quat;
+tf2::Matrix3x3 current_att_mat;
 std::vector<double> pos_ref;
 std::vector<double> current_pos_att;
 std::vector<double> current_vel_rate;

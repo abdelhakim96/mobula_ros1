@@ -2,9 +2,9 @@
 #define _NMPC_PC_H
 
 #include <math.h>
-#include <Eigen/Dense>
-#include <tf/tf.h>
 #include <time.h>
+
+#include "Eigen/Dense"
 
 #include "nmpc_common.h"
 #include "nmpc_auxiliary_functions.h"

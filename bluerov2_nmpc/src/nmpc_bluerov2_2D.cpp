@@ -2,11 +2,9 @@
  * @file   nmpc_bluerov2_2-D.cpp
  * @author Hakim Amer 
  * @date   Jan 2023
- *
-
  */
 
-#include <nmpc_bluerov2_2D.h>
+#include "nmpc_bluerov2_2D.h"
 
 using namespace Eigen;
 
