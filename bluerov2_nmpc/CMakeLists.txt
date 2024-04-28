@@ -15,6 +15,13 @@ find_package(ament_cmake REQUIRED)
 find_package(Eigen3 3.0.1 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIRS})
 
+find_package(rclcpp REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(mavros_msgs REQUIRED)
+
 
 # Message generation
 find_package(rosidl_default_generators REQUIRED)
@@ -25,7 +32,7 @@ ament_export_dependencies(rosidl_default_runtime)
 
 
 # Add library
-add_library(lib${PROJECT_NAME} 
+add_library(lib${PROJECT_NAME} SHARED
   solver/qpoases/SRC/Bounds.cpp
   solver/qpoases/SRC/Constraints.cpp
   solver/qpoases/SRC/CyclingManager.cpp
@@ -43,19 +50,15 @@ add_library(lib${PROJECT_NAME}
 )
 
 target_compile_features(lib${PROJECT_NAME} PRIVATE c_std_99 cxx_std_17) 
-target_include_directories(lib${PROJECT_NAME} PRIVATE
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/solver
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/solver/qpoases
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/solver/qpoases/INCLUDE
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/solver/qpoases/INCLUDE/EXTRAS
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/solver/qpoases/SRC
-)
 
-# Causes the visibility macros to use dllexport rather than dllimport,
-# which is appropriate when building the dll but not consuming it.
-target_compile_definitions(lib${PROJECT_NAME} PRIVATE "BLUEROV2_NMPC_BUILDING_LIBRARY")
+target_include_directories(lib${PROJECT_NAME} PUBLIC
+  $<INSTALL_INTERFACE:include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/solver>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/solver/qpoases>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/solver/qpoases/INCLUDE>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/solver/qpoases/INCLUDE/EXTRAS>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/solver/qpoases/SRC>
+)
 
 install(
   DIRECTORY include/
@@ -75,9 +78,23 @@ add_executable(${PROJECT_NAME}_node
   src/nmpc_bluerov2_2D_main.cpp 
   src/nmpc_bluerov2_2D.cpp 
 )
-target_link_libraries(${PROJECT_NAME}_node PUBLIC
+
+ament_target_dependencies(${PROJECT_NAME}_node PUBLIC
+  rclcpp
+  tf2
+  std_msgs
+  geometry_msgs
+  nav_msgs
+  mavros_msgs
+) 
+
+target_link_libraries(${PROJECT_NAME}_node PRIVATE
+  boost
   lib${PROJECT_NAME}
-  ${catkin_LIBRARIES}
+)
+
+target_include_directories(${PROJECT_NAME}_node PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
 install(TARGETS ${PROJECT_NAME}_node

@@ -5,6 +5,8 @@
  */
 
 #include "nmpc_bluerov2_2D.h"
+#include <boost/bind.hpp>
+#include <iostream>
 
 using namespace Eigen;
 
@@ -226,7 +228,7 @@ void NMPC_PC::nmpc_core(struct nmpc_struct_& _nmpc_inp_struct,
     // Calculate the entire execution time!
     commandstruct.exe_time = ((double)(clock() - stopwatch)) / CLOCKS_PER_SEC;
 
-    //    ROS_INFO_STREAM("Stoptime outer NMPC: " << ros::Time::now().toSec() - stopwatch.toSec() << " (sec)");
+    //    ROS_INFO_STREAM("Stoptime outer NMPC: " << rclcpp::Time::now().toSec() - stopwatch.toSec() << " (sec)");
 
     /* ------ NMPC_DEBUG ------*/
     //  acadostruct.printDifferentialVariables();
@@ -308,4 +310,59 @@ void NMPC_PC::nan_check_for_dist_estimates(struct online_data_struct_& online_da
         std::cout << "Zero values are enforced! \n";
         std::fill(online_data.distFz.begin(), online_data.distFz.end(), 0);
     }
+}
+
+void NMPC_PC::publish_wrench(struct command_struct& commandstruct)
+{
+
+    geometry_msgs::msg::Wrench nmpc_wrench_msg;
+
+    
+    
+    nmpc_wrench_msg.force.x =    commandstruct.control_wrench_vec[0];
+    nmpc_wrench_msg.force.y =    commandstruct.control_wrench_vec[1];
+    nmpc_wrench_msg.force.z =    commandstruct.control_wrench_vec[2];
+
+    nmpc_wrench_msg.torque.x =    0.0;
+    nmpc_wrench_msg.torque.y =    0.0;
+    nmpc_wrench_msg.torque.z =   commandstruct.control_wrench_vec[3];
+
+    nmpc_cmd_wrench_pub->publish(nmpc_wrench_msg);
+    
+
+    std_msgs::msg::Float64 exe_time_msg;
+    exe_time_msg.data = commandstruct.exe_time;
+    nmpc_cmd_exeTime_pub->publish(exe_time_msg);
+
+    std_msgs::msg::Float64 kkt_tol_msg;
+    kkt_tol_msg.data = commandstruct.kkt_tol;
+    nmpc_cmd_kkt_pub->publish(kkt_tol_msg);
+
+    std_msgs::msg::Float64 obj_val_msg;
+    obj_val_msg.data = commandstruct.obj_val;
+    nmpc_cmd_obj_pub->publish(obj_val_msg);
+
+}
+
+
+void NMPC_PC::publish_pred_tarjectory(struct acado_struct& traj_struct)
+{
+      // Create an instance of the Float32MultiArray message type
+    std_msgs::msg::Float64MultiArray pred_traj_msg;
+
+    // Resize the data array based on the size of nmpc_pc->nmpc_struct.x
+   pred_traj_msg.data.resize(NMPC_NX * (NMPC_N + 1));
+
+
+       for (int i = 0; i < NMPC_NX * (NMPC_N + 1); ++i)
+    {
+       // pred_traj_msg.data[i] = traj_struct.x[i];
+        pred_traj_msg.data[i] =  nmpc_struct.x[0+9];
+    }
+   
+
+  nmpc_pred_traj_pub->publish(pred_traj_msg);
+  
+    // a = nmpc_pc->nmpc_struct.x[0+9] <<endl;
+ 
 }

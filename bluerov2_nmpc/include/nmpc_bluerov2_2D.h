@@ -3,6 +3,9 @@
 
 #include <math.h>
 #include <time.h>
+#include <vector>
+
+#include <boost/function.hpp>
 
 #include "Eigen/Dense"
 
