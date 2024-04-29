@@ -89,7 +89,6 @@ ament_target_dependencies(${PROJECT_NAME}_node PUBLIC
 ) 
 
 target_link_libraries(${PROJECT_NAME}_node PRIVATE
-  boost
   lib${PROJECT_NAME}
 )
 

@@ -25,6 +25,9 @@ public:
     NMPCBlueROV2Node();
 
 private:
+    // Main loop callback
+    void main_loop();
+
     // Subscribers
     rclcpp::Subscription<mavros_msgs::msg::State>::SharedPtr            state_sub;
     rclcpp::Subscription<geometry_msgs::msg::Vector3>::SharedPtr        ref_position_sub;
@@ -48,11 +51,39 @@ private:
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr s_sdot_pub;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr nmpc_pred_traj_pub;
     
-    
+    // Subscriber callbacks
+    void state_cb(const mavros_msgs::msg::State::ConstSharedPtr& msg);
+    void ref_position_cb(const geometry_msgs::msg::Vector3::ConstSharedPtr& msg);
+    void ref_velocity_cb(const geometry_msgs::msg::Vector3::ConstSharedPtr& msg);
+    void ref_yaw_cb(const std_msgs::msg::Float64::ConstSharedPtr& msg);
+    void pos_cb(const nav_msgs::msg::Odometry::ConstSharedPtr& msg);
+    void vel_cb(const geometry_msgs::msg::TwistStamped::ConstSharedPtr& msg);
+    void orientation_cb(const geometry_msgs::msg::Vector3Stamped::ConstSharedPtr& msg);
+    void dist_Fx_predInit_cb(const std_msgs::msg::Bool::ConstSharedPtr& msg);
+    void dist_Fy_predInit_cb(const std_msgs::msg::Bool::ConstSharedPtr& msg);
+    void dist_Fz_predInit_cb(const std_msgs::msg::Bool::ConstSharedPtr& msg);
+    void dist_Fx_data_cb(const std_msgs::msg::Float64MultiArray::ConstSharedPtr& msg);
+    void dist_Fy_data_cb(const std_msgs::msg::Float64MultiArray::ConstSharedPtr& msg);
+    void dist_Fz_data_cb(const std_msgs::msg::Float64MultiArray::ConstSharedPtr& msg);
+
+    // Functions for publishing
+    void publish_wrench(struct NMPC_PC::command_struct& commandstruct);
+    void publish_pred_tarjectory(struct  NMPC_PC::acado_struct& traj_struct);
+
     // State variables
+    NMPC_PC* nmpc_pc;
     nmpc_struct_ nmpc_struct;
     online_data_struct_ online_data;
     
+    struct _dist_struct
+    {
+        bool predInit;
+        int print_predInit = 1;
+        std::vector<double> data;
+        std::vector<double> data_zeros;
+    } dist_Fx, dist_Fy, dist_Fz;
+
+    mavros_msgs::msg::State current_state_msg;
     std::string mocap_topic_part, dist_Fx_predInit_topic, dist_Fy_predInit_topic, dist_Fz_predInit_topic,
         dist_Fx_data_topic, dist_Fy_data_topic, dist_Fz_data_topic;
     bool online_ref_yaw;
@@ -60,8 +91,8 @@ private:
     bool use_dist_estimates;
     
     double m_in, g_in;
-    Eigen::VectorXd Uref_in(NMPC_NU);
-    Eigen::VectorXd W_in(NMPC_NY);
+    Eigen::Matrix<double, NMPC_NU, 1> Uref_in;
+    Eigen::Matrix<double, NMPC_NY, 1> W_in;
     
     int print_flag_offboard = 1, print_flag_arm = 1, print_flag_altctl = 1, print_flag_traj_finished = 0;
     
@@ -84,12 +115,5 @@ private:
     std::vector<double> current_s_sdot;
 };
 
-struct _dist_struct
-{
-    bool predInit;
-    int print_predInit = 1;
-    std::vector<double> data;
-    std::vector<double> data_zeros;
-} dist_Fx, dist_Fy, dist_Fz;
 
 #endif

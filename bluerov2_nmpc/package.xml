@@ -19,7 +19,6 @@
   <depend>nav_msgs</depend>
   <depend>mavros_msgs</depend>
   <depend>tf2_sensor_msgs</depend>
-  <depend>boost</depend>
 
   <depend>tf2</depend>
   <depend>joy</depend>
