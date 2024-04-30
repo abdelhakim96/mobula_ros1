@@ -20,7 +20,6 @@ find_package(tf2 REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
-find_package(mavros_msgs REQUIRED)
 
 
 # Message generation
@@ -85,7 +84,7 @@ ament_target_dependencies(${PROJECT_NAME}_node PUBLIC
   std_msgs
   geometry_msgs
   nav_msgs
-  mavros_msgs
+  
 ) 
 
 target_link_libraries(${PROJECT_NAME}_node PRIVATE

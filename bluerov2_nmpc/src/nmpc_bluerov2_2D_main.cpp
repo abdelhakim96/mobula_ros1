@@ -1,3 +1,4 @@
+
 /**
  * @file   nmpc_bluerov2_2-D_main.cpp
  * @author Mohit Mehindratta / Hakim Amer
@@ -17,10 +18,10 @@ using namespace Eigen;
 using namespace rclcpp;
 using std::placeholders::_1;
 
-void NMPCBlueROV2Node::state_cb(const mavros_msgs::msg::State::ConstSharedPtr& msg)
-{
-    this->current_state_msg = *msg;
-}
+//void NMPCBlueROV2Node::state_cb(const mavros_msgs::msg::State::ConstSharedPtr& msg)
+//{
+//    this->current_state_msg = *msg;
+//}
 void NMPCBlueROV2Node::ref_position_cb(const geometry_msgs::msg::Vector3::ConstSharedPtr& msg)
 {
     this->ref_position << msg->x, msg->y, msg->z;
@@ -195,33 +196,22 @@ void NMPCBlueROV2Node::publish_pred_tarjectory(struct NMPC_PC::acado_struct& tra
 
 NMPCBlueROV2Node::NMPCBlueROV2Node() : Node("nmpc_bluerov2_node")
 {
+    // ---------------
     // Main loop timer
+    // ---------------
     this->create_wall_timer(SAMPLE_TIME, std::bind(&NMPCBlueROV2Node::main_loop, this));
 
-    // Input topic parameters
-    this->declare_parameter("mocap_topic_part", rclcpp::PARAMETER_STRING);
-    this->mocap_topic_part = this->get_parameter("mocap_topic_part").as_string();
+    this->mocap_topic_part = "/predefined/mocap_topic_part";
+    this->dist_Fx_predInit_topic = "/predefined/dist_Fx_predInit_topic";
+    this->dist_Fy_predInit_topic = "/predefined/dist_Fy_predInit_topic";
+    this->dist_Fz_predInit_topic = "/predefined/dist_Fz_predInit_topic";
+    this->dist_Fx_data_topic = "/predefined/dist_Fx_data_topic";
+    this->dist_Fy_data_topic = "/predefined/dist_Fy_data_topic";
+    this->dist_Fz_data_topic = "/predefined/dist_Fz_data_topic";
 
-    this->declare_parameter("dist_Fx_predInit_topic", rclcpp::PARAMETER_STRING);
-    this->dist_Fx_predInit_topic = this->get_parameter("dist_Fx_predInit_topic").as_string();
-    this->declare_parameter("dist_Fy_predInit_topic", rclcpp::PARAMETER_STRING);
-    this->dist_Fy_predInit_topic = this->get_parameter("dist_Fy_predInit_topic").as_string();
-    this->declare_parameter("dist_Fz_predInit_topic", rclcpp::PARAMETER_STRING);
-    this->dist_Fz_predInit_topic = this->get_parameter("dist_Fz_predInit_topic").as_string();
-
-    this->declare_parameter("dist_Fx_data_topic", rclcpp::PARAMETER_STRING);
-    this->dist_Fx_data_topic = this->get_parameter("dist_Fx_data_topic").as_string();
-    this->declare_parameter("dist_Fy_data_topic", rclcpp::PARAMETER_STRING);
-    this->dist_Fy_data_topic = this->get_parameter("dist_Fy_data_topic").as_string();
-    this->declare_parameter("dist_Fz_data_topic", rclcpp::PARAMETER_STRING);
-    this->dist_Fz_data_topic = this->get_parameter("dist_Fz_data_topic").as_string();
-
-
-    // ----------
+    // -----------
     // Subscribers
-    // ----------
-
-    this->state_sub = this->create_subscription<mavros_msgs::msg::State>("mavros/state", 1, std::bind(&NMPCBlueROV2Node::state_cb, this, _1));
+    // -----------
     this->ref_position_sub = this->create_subscription<geometry_msgs::msg::Vector3>("ref_trajectory/position", 1, std::bind(&NMPCBlueROV2Node::ref_position_cb, this, _1));
     this->ref_velocity_sub = this->create_subscription<geometry_msgs::msg::Vector3>("ref_trajectory/velocity", 1, std::bind(&NMPCBlueROV2Node::ref_velocity_cb, this, _1));
     this->ref_yaw_sub = this->create_subscription<std_msgs::msg::Float64>("ref_trajectory/yaw", 1, std::bind(&NMPCBlueROV2Node::ref_yaw_cb, this, _1));
@@ -248,8 +238,9 @@ NMPCBlueROV2Node::NMPCBlueROV2Node() : Node("nmpc_bluerov2_node")
 
     this->nmpc_struct.U_ref.resize(NMPC_NU);
     this->nmpc_struct.W.resize(NMPC_NY);
-
+    /*
     // Roslaunch parameters
+      
     this->declare_parameter("verbose", rclcpp::PARAMETER_BOOL);
     this->nmpc_struct.verbose = this->get_parameter("verbose").as_bool();
     this->declare_parameter("yaw_control", rclcpp::PARAMETER_BOOL);
@@ -301,6 +292,28 @@ NMPCBlueROV2Node::NMPCBlueROV2Node() : Node("nmpc_bluerov2_node")
     this->declare_parameter("W_Mz", rclcpp::PARAMETER_DOUBLE);
     this->nmpc_struct.W(w_idx++) = this->get_parameter("W_Mz").as_double();
     assert(w_idx == NMPC_NY);
+    */
+
+    // Assign values from launch file parameters
+    this->nmpc_struct.W_Wn_factor = 0.5;
+    
+    this->nmpc_struct.U_ref(0) = 0.0; // F_x_ref
+    this->nmpc_struct.U_ref(1) = 0.0; // F_y_ref
+    this->nmpc_struct.U_ref(2) = 0.0; // F_z_ref
+    this->nmpc_struct.U_ref(3) = 0.0; // Mz_ref
+    
+    this->nmpc_struct.W(0) = 100.0; // W_x
+    this->nmpc_struct.W(1) = 100.0; // W_y
+    this->nmpc_struct.W(2) = 50.0; // W_z
+    this->nmpc_struct.W(3) = 1.0; // W_u
+    this->nmpc_struct.W(4) = 1.0; // W_v
+    this->nmpc_struct.W(5) = 1.0; // W_w
+    this->nmpc_struct.W(6) = 1.0; // W_psi
+    this->nmpc_struct.W(7) = 0.1; // W_r
+    this->nmpc_struct.W(8) = 0.1; // W_Fx
+    this->nmpc_struct.W(9) = 0.1; // W_Fy
+    this->nmpc_struct.W(10) = 0.1; // W_Fz
+    this->nmpc_struct.W(11) = 0.5; // W_Mz
 
     this->nmpc_struct.sample_time = std::chrono::duration<double>(SAMPLE_TIME).count();
 
@@ -321,49 +334,20 @@ NMPCBlueROV2Node::NMPCBlueROV2Node() : Node("nmpc_bluerov2_node")
     this->ref_velocity << 0, 0, 0;
 
     this->angles = { 0,0,0};
-    
-    this->control_stop = false;
-
-    if (current_state_msg.mode != "OFFBOARD" && this->print_flag_offboard == 1)
-    {
-        RCLCPP_INFO(this->get_logger(), "OFFBOARD mode is not enabled!") ;
-        this->print_flag_offboard = 0;
-    }
-    if (!current_state_msg.armed && this->print_flag_arm == 1)
-    {
-        RCLCPP_INFO(this->get_logger(), "Vehicle is not armed!") ;
-        this->print_flag_arm = 2;
-    }
-    else if (current_state_msg.armed && this->print_flag_arm == 2)
-    {
-        RCLCPP_INFO(this->get_logger(), "Vehicle is armed!") ;
-        this->print_flag_arm = 0;
-    }
-
-    if (current_state_msg.mode == "ALTCTL")
-    {
-        this->pos_ref = current_pos_att;
-        if (this->print_flag_altctl == 1)
-        {
-            RCLCPP_INFO(this->get_logger(), "ALTCTL mode is enabled!") ;
-            this->print_flag_altctl = 0;
-        }
-    }
 
     if (!nmpc_pc->return_control_init_value())
     {
         nmpc_pc->nmpc_init(pos_ref, nmpc_pc->nmpc_struct);
         if (this->nmpc_struct.verbose && nmpc_pc->return_control_init_value())
         {
-            std::cout << "***********************************\n";
-            std::cout << "NMPC: initialized correctly\n";
-            std::cout << "***********************************\n";
+            RCLCPP_INFO("NMPC: initialized correctly\n");
         }
     }
 }
 
 void NMPCBlueROV2Node::main_loop()
 {
+    RCLCPP_INFO_STREAM(this->get_logger(), "Main loop at time = " << this->get_clock()->now().seconds() << " (sec)");
     this->current_states = {
         current_pos_att.at(0),
         current_pos_att.at(1),
@@ -427,15 +411,12 @@ void NMPCBlueROV2Node::main_loop()
                     this->online_data,
                     this->current_states);
 
-    if (nmpc_pc->acado_feedbackStep_fb != 0)
-        this->control_stop = true;
-
-    if (std::isnan(nmpc_pc->nmpc_struct.u[0]) == true || std::isnan(nmpc_pc->nmpc_struct.u[1]) == true ||
+    if (nmpc_pc->acado_feedbackStep_fb != 0 ||
+        std::isnan(nmpc_pc->nmpc_struct.u[0]) == true || std::isnan(nmpc_pc->nmpc_struct.u[1]) == true ||
         std::isnan(nmpc_pc->nmpc_struct.u[2]) == true || std::isnan(nmpc_pc->nmpc_struct.u[3]) == true)
     {
         RCLCPP_ERROR_STREAM(this->get_logger(), "Controller ERROR at time = " << this->get_clock()->now().seconds() << " (sec)");
-        this->control_stop = true;
-        exit(0);
+        rclcpp::shutdown();
     }
 
     std::cout << "predicted dist x "<< this->online_data.distFx[0]<<endl;
@@ -449,9 +430,13 @@ void NMPCBlueROV2Node::main_loop()
 }
 
 int main(int argc, char * argv[])
-{
-  rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<NMPCBlueROV2Node>());
-  rclcpp::shutdown();
-  return -1;
+{ 
+    // Init ROS2 node
+    rclcpp::init(argc, argv);
+    auto node = std::make_shared<NMPCBlueROV2Node>(); 
+    // Use a single-threaded executor - Node is not thread-safe
+    rclcpp::spin(node); 
+    // Shutdown ROS2 node
+    rclcpp::shutdown();
+    return 0;
 }

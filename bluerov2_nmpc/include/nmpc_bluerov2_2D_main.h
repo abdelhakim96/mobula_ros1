@@ -13,8 +13,6 @@
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "geometry_msgs/msg/vector3_stamped.hpp"
 #include "nav_msgs/msg/odometry.hpp" 
-#include "mavros_msgs/msg/state.hpp"
-#include "mavros_msgs/msg/thrust.hpp"
 
 #include "nmpc_bluerov2_2D.h"
 
@@ -23,13 +21,11 @@ class NMPCBlueROV2Node : public rclcpp::Node
 {
 public:
     NMPCBlueROV2Node();
-
 private:
     // Main loop callback
     void main_loop();
 
     // Subscribers
-    rclcpp::Subscription<mavros_msgs::msg::State>::SharedPtr            state_sub;
     rclcpp::Subscription<geometry_msgs::msg::Vector3>::SharedPtr        ref_position_sub;
     rclcpp::Subscription<geometry_msgs::msg::Vector3>::SharedPtr        ref_velocity_sub;
     rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr             ref_yaw_sub;
@@ -52,7 +48,6 @@ private:
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr nmpc_pred_traj_pub;
     
     // Subscriber callbacks
-    void state_cb(const mavros_msgs::msg::State::ConstSharedPtr& msg);
     void ref_position_cb(const geometry_msgs::msg::Vector3::ConstSharedPtr& msg);
     void ref_velocity_cb(const geometry_msgs::msg::Vector3::ConstSharedPtr& msg);
     void ref_yaw_cb(const std_msgs::msg::Float64::ConstSharedPtr& msg);
@@ -83,11 +78,9 @@ private:
         std::vector<double> data_zeros;
     } dist_Fx, dist_Fy, dist_Fz;
 
-    mavros_msgs::msg::State current_state_msg;
     std::string mocap_topic_part, dist_Fx_predInit_topic, dist_Fy_predInit_topic, dist_Fz_predInit_topic,
         dist_Fx_data_topic, dist_Fy_data_topic, dist_Fz_data_topic;
     bool online_ref_yaw;
-    bool control_stop;
     bool use_dist_estimates;
     
     double m_in, g_in;
