@@ -182,9 +182,8 @@ void NMPCBlueROV2Node::publish_pred_tarjectory(struct NMPC_PC::acado_struct& tra
     // a = nmpc_pc->nmpc_struct.x[0+9] <<endl;
 }
 
-NMPCBlueROV2Node::NMPCBlueROV2Node() : Node("nmpc_bluerov2_node")
+NMPCBlueROV2Node::NMPCBlueROV2Node() : Node("bluerov2_nmpc_node")
 {
-    RCLCPP_INFO_STREAM(this->get_logger(), "Initialization started");
     // ---------------
     // Main loop timer
     // ---------------
@@ -250,8 +249,8 @@ NMPCBlueROV2Node::NMPCBlueROV2Node() : Node("nmpc_bluerov2_node")
     this->nmpc_struct.U_ref(u_idx++) = this->get_parameter("F_y_ref").as_double();
     this->declare_parameter("F_z_ref", rclcpp::PARAMETER_DOUBLE);
     this->nmpc_struct.U_ref(u_idx++) = this->get_parameter("F_z_ref").as_double();
-    this->declare_parameter("Mz_ref", rclcpp::PARAMETER_DOUBLE);
-    this->nmpc_struct.U_ref(u_idx++) = this->get_parameter("Mz_ref").as_double();
+    this->declare_parameter("M_z_ref", rclcpp::PARAMETER_DOUBLE);
+    this->nmpc_struct.U_ref(u_idx++) = this->get_parameter("M_z_ref").as_double();
 
     assert(u_idx == NMPC_NU);
 
@@ -310,14 +309,10 @@ NMPCBlueROV2Node::NMPCBlueROV2Node() : Node("nmpc_bluerov2_node")
             RCLCPP_INFO(this->get_logger(), "NMPC: initialized correctly\n");
         }
     }
-    RCLCPP_INFO_STREAM(this->get_logger(), "Initialization done");
 }
 
 void NMPCBlueROV2Node::main_loop()
 {
-    RCLCPP_INFO(this->get_logger(), "Main");
-    RCLCPP_INFO_STREAM(this->get_logger(), "Main loop at time = " << this->get_clock()->now().seconds() << " (sec)");
-
     this->current_states = {
         current_pos_att.at(0),
         current_pos_att.at(1),
