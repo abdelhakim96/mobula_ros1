@@ -22,7 +22,8 @@ class NMPCBlueROV2Node : public rclcpp::Node
 public:
     NMPCBlueROV2Node();
 private:
-    // Main loop callback
+    // Timers
+    rclcpp::TimerBase::SharedPtr main_loop_timer;
     void main_loop();
 
     // Subscribers

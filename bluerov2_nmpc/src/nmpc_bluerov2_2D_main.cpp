@@ -18,10 +18,7 @@ using namespace Eigen;
 using namespace rclcpp;
 using std::placeholders::_1;
 
-//void NMPCBlueROV2Node::state_cb(const mavros_msgs::msg::State::ConstSharedPtr& msg)
-//{
-//    this->current_state_msg = *msg;
-//}
+
 void NMPCBlueROV2Node::ref_position_cb(const geometry_msgs::msg::Vector3::ConstSharedPtr& msg)
 {
     this->ref_position << msg->x, msg->y, msg->z;
@@ -47,14 +44,8 @@ void NMPCBlueROV2Node::pos_cb(const nav_msgs::msg::Odometry::ConstSharedPtr& msg
                         msg->twist.twist.angular.y,
                         msg->twist.twist.angular.z};
 
-
-    //current_att_mat.setRotation(current_att_quat);
-    //current_att_mat.getRPY(roll, pitch, yaw);
-    //current_att_mat.getRPY(pitch, roll, yaw);
     this->current_pos_att = {msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z, roll, pitch, yaw};
 }
-
-
 
 void NMPCBlueROV2Node::vel_cb(const geometry_msgs::msg::TwistStamped::ConstSharedPtr& msg)
 {
@@ -65,7 +56,6 @@ void NMPCBlueROV2Node::vel_cb(const geometry_msgs::msg::TwistStamped::ConstShare
                         msg->twist.angular.y,
                         msg->twist.angular.z};
 }
-
 
 void NMPCBlueROV2Node::orientation_cb(const geometry_msgs::msg::Vector3Stamped::ConstSharedPtr& msg)
 {   
@@ -78,9 +68,6 @@ void NMPCBlueROV2Node::orientation_cb(const geometry_msgs::msg::Vector3Stamped::
                    msg->vector.z}; 
 }
 
-
-// Disturbance estimator Call back functions X, Y,Z
-
 void NMPCBlueROV2Node::dist_Fx_predInit_cb(const std_msgs::msg::Bool::ConstSharedPtr& msg)
 {
     this->dist_Fx.predInit = msg->data;
@@ -90,6 +77,7 @@ void NMPCBlueROV2Node::dist_Fx_predInit_cb(const std_msgs::msg::Bool::ConstShare
         this->dist_Fx.print_predInit = 0;
     }
 }
+
 void NMPCBlueROV2Node::dist_Fy_predInit_cb(const std_msgs::msg::Bool::ConstSharedPtr& msg)
 {
     this->dist_Fy.predInit = msg->data;
@@ -99,6 +87,7 @@ void NMPCBlueROV2Node::dist_Fy_predInit_cb(const std_msgs::msg::Bool::ConstShare
         this->dist_Fy.print_predInit = 0;
     }
 }
+
 void NMPCBlueROV2Node::dist_Fz_predInit_cb(const std_msgs::msg::Bool::ConstSharedPtr& msg)
 {
     this->dist_Fz.predInit = msg->data;
@@ -119,6 +108,7 @@ void NMPCBlueROV2Node::dist_Fx_data_cb(const std_msgs::msg::Float64MultiArray::C
     else
         this->dist_Fx.data = this->dist_Fx.data_zeros;
 }
+
 void NMPCBlueROV2Node::dist_Fy_data_cb(const std_msgs::msg::Float64MultiArray::ConstSharedPtr& msg)
 {
     if (use_dist_estimates && this->dist_Fy.predInit)
@@ -129,6 +119,7 @@ void NMPCBlueROV2Node::dist_Fy_data_cb(const std_msgs::msg::Float64MultiArray::C
     else
         this->dist_Fy.data = this->dist_Fy.data_zeros;
 }
+
 void NMPCBlueROV2Node::dist_Fz_data_cb(const std_msgs::msg::Float64MultiArray::ConstSharedPtr& msg)
 {
     if (use_dist_estimates && this->dist_Fz.predInit)
@@ -168,9 +159,7 @@ void NMPCBlueROV2Node::publish_wrench(struct NMPC_PC::command_struct& commandstr
     std_msgs::msg::Float64 obj_val_msg;
     obj_val_msg.data = commandstruct.obj_val;
     this->nmpc_cmd_obj_pub->publish(obj_val_msg);
-
 }
-
 
 void NMPCBlueROV2Node::publish_pred_tarjectory(struct NMPC_PC::acado_struct& traj_struct)
 {
@@ -191,15 +180,15 @@ void NMPCBlueROV2Node::publish_pred_tarjectory(struct NMPC_PC::acado_struct& tra
     this->nmpc_pred_traj_pub->publish(pred_traj_msg);
   
     // a = nmpc_pc->nmpc_struct.x[0+9] <<endl;
- 
 }
 
 NMPCBlueROV2Node::NMPCBlueROV2Node() : Node("nmpc_bluerov2_node")
 {
+    RCLCPP_INFO_STREAM(this->get_logger(), "Initialization started");
     // ---------------
     // Main loop timer
     // ---------------
-    this->create_wall_timer(SAMPLE_TIME, std::bind(&NMPCBlueROV2Node::main_loop, this));
+    this-> main_loop_timer = this->create_wall_timer(SAMPLE_TIME, std::bind(&NMPCBlueROV2Node::main_loop, this));
 
     this->mocap_topic_part = "/predefined/mocap_topic_part";
     this->dist_Fx_predInit_topic = "/predefined/dist_Fx_predInit_topic";
@@ -238,7 +227,7 @@ NMPCBlueROV2Node::NMPCBlueROV2Node() : Node("nmpc_bluerov2_node")
 
     this->nmpc_struct.U_ref.resize(NMPC_NU);
     this->nmpc_struct.W.resize(NMPC_NY);
-    /*
+    
     // Roslaunch parameters
       
     this->declare_parameter("verbose", rclcpp::PARAMETER_BOOL);
@@ -292,28 +281,6 @@ NMPCBlueROV2Node::NMPCBlueROV2Node() : Node("nmpc_bluerov2_node")
     this->declare_parameter("W_Mz", rclcpp::PARAMETER_DOUBLE);
     this->nmpc_struct.W(w_idx++) = this->get_parameter("W_Mz").as_double();
     assert(w_idx == NMPC_NY);
-    */
-
-    // Assign values from launch file parameters
-    this->nmpc_struct.W_Wn_factor = 0.5;
-    
-    this->nmpc_struct.U_ref(0) = 0.0; // F_x_ref
-    this->nmpc_struct.U_ref(1) = 0.0; // F_y_ref
-    this->nmpc_struct.U_ref(2) = 0.0; // F_z_ref
-    this->nmpc_struct.U_ref(3) = 0.0; // Mz_ref
-    
-    this->nmpc_struct.W(0) = 100.0; // W_x
-    this->nmpc_struct.W(1) = 100.0; // W_y
-    this->nmpc_struct.W(2) = 50.0; // W_z
-    this->nmpc_struct.W(3) = 1.0; // W_u
-    this->nmpc_struct.W(4) = 1.0; // W_v
-    this->nmpc_struct.W(5) = 1.0; // W_w
-    this->nmpc_struct.W(6) = 1.0; // W_psi
-    this->nmpc_struct.W(7) = 0.1; // W_r
-    this->nmpc_struct.W(8) = 0.1; // W_Fx
-    this->nmpc_struct.W(9) = 0.1; // W_Fy
-    this->nmpc_struct.W(10) = 0.1; // W_Fz
-    this->nmpc_struct.W(11) = 0.5; // W_Mz
 
     this->nmpc_struct.sample_time = std::chrono::duration<double>(SAMPLE_TIME).count();
 
@@ -340,14 +307,17 @@ NMPCBlueROV2Node::NMPCBlueROV2Node() : Node("nmpc_bluerov2_node")
         nmpc_pc->nmpc_init(pos_ref, nmpc_pc->nmpc_struct);
         if (this->nmpc_struct.verbose && nmpc_pc->return_control_init_value())
         {
-            RCLCPP_INFO("NMPC: initialized correctly\n");
+            RCLCPP_INFO(this->get_logger(), "NMPC: initialized correctly\n");
         }
     }
+    RCLCPP_INFO_STREAM(this->get_logger(), "Initialization done");
 }
 
 void NMPCBlueROV2Node::main_loop()
 {
+    RCLCPP_INFO(this->get_logger(), "Main");
     RCLCPP_INFO_STREAM(this->get_logger(), "Main loop at time = " << this->get_clock()->now().seconds() << " (sec)");
+
     this->current_states = {
         current_pos_att.at(0),
         current_pos_att.at(1),
@@ -431,12 +401,9 @@ void NMPCBlueROV2Node::main_loop()
 
 int main(int argc, char * argv[])
 { 
-    // Init ROS2 node
-    rclcpp::init(argc, argv);
-    auto node = std::make_shared<NMPCBlueROV2Node>(); 
     // Use a single-threaded executor - Node is not thread-safe
-    rclcpp::spin(node); 
-    // Shutdown ROS2 node
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<NMPCBlueROV2Node>());
     rclcpp::shutdown();
     return 0;
 }
