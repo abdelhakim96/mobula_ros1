@@ -35,3 +35,27 @@ source install/local_setup.sh
 ```
 
 
+ ## Running on simulated bluerov
+
+  Create ROVType.txt file inside bin_Debug folder
+  write the word "Simulator" on the first line
+
+ ## Running on real bluerov
+
+  remove the word Simulator from  ROVType.txt
+ 
+ Inside MobularosManager us MavlinkIMUAcceleration
+```bash
+ 	private void PublishLinearAcceleration()
+		{
+			EMatrix linearAccelerations = new EMatrix(3, 1)
+			{
+				status.MavlinkIMUAccelerationX,
+				status.MavlinkIMUAccelerationY,
+				status.MavlinkIMUAccelerationZ
+				//status.IMURawAccelerationX,
+				//status.IMURawAccelerationY,
+				//status.IMURawAccelerationZ
+			};
+```
+
