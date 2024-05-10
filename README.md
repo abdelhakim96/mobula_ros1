@@ -35,6 +35,12 @@ source install/local_setup.sh
 ```
 
 
+```bash
+ros2 run mhe_lambda mhe_x_node 
+```
+run all three nodes x ,y and z
+
+
  ## Running on simulated bluerov
 
   Create ROVType.txt file inside bin_Debug folder
