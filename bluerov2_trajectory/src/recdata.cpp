@@ -8,8 +8,9 @@
 #include <string>
 #include <chrono>
 #include <std_msgs/Bool.h>
+#include <iomanip>
 
-std::string file_prefix = "/home/hakim/catkin_ws/src/mobula_ros1/bluerov2_trajectory/test_recordings/recorded_data_brov_";
+std::string file_prefix = "/home/hakim/catkin_ws/src/mobula_ros1/bluerov2_trajectory/figure8/rec_";
 std::string file_extension = ".txt";
 std::ofstream print_results;
 
@@ -63,10 +64,7 @@ void W3_cb(const std_msgs::Float64::ConstPtr& msg) {
 
 void mu_y_cb(const std_msgs::Float64MultiArray::ConstPtr& msg) {
     mu_y = *msg;
-    //is_mu_y_received = !mu_y.data.empty();
 }
-
-
 
 void featx_cb(const std_msgs::Float64MultiArray::ConstPtr& msg) {
     featx = *msg;
@@ -104,6 +102,7 @@ void write_data_to_file(const ros::TimerEvent& event) {
     double velocity_error_y = rov_odometry.twist.twist.linear.y - ref_velocity.y;
     double velocity_error_z = rov_odometry.twist.twist.linear.z - ref_velocity.z;
 
+    print_results << std::setprecision(11);
     print_results << ref_position.x << "," << ref_position.y << "," << ref_position.z << ",";
     print_results << rov_odometry.pose.pose.position.x << "," << rov_odometry.pose.pose.position.y << "," << rov_odometry.pose.pose.position.z << ",";
     print_results << position_error_x << "," << position_error_y << "," << position_error_z << ",";
@@ -154,13 +153,12 @@ int main(int argc, char** argv) {
     ros::Subscriber featx_sub = nh.subscribe<std_msgs::Float64MultiArray>("/dev/gp/feature_x_filtered", 1, featx_cb);
     ros::Subscriber featy_sub = nh.subscribe<std_msgs::Float64MultiArray>("/dev/gp/feature_y_filtered", 1, featy_cb);
 
-
     ros::Subscriber mu_x_sub = nh.subscribe<std_msgs::Float64MultiArray>("/gp_disturb_reg/mu/x", 1, mu_x_cb);
     ros::Subscriber disturbance_sub = nh.subscribe<geometry_msgs::Wrench>("/mobula/rov/disturbance", 1, disturbance_cb);
     ros::Subscriber traj_on_sub = nh.subscribe<std_msgs::Bool>("/trajectory_on", 1, traj_on_cb);
 
     ros::Timer data_timer = nh.createTimer(ros::Duration(0.1), write_data_to_file);
-    ros::Timer stop_timer = nh.createTimer(ros::Duration(100.0), stop_recording);
+    ros::Timer stop_timer = nh.createTimer(ros::Duration(650.0), stop_recording);
 
     ros::spin();
 

@@ -150,7 +150,7 @@ int main(int argc, char** argv)
         if (traj_type == 2)  // Circlular trajectory with specified radius,centre and velocity
             {
 
-
+               
             if (trajectory_reset== true) {
                 // Reset trajectory to start from the beginning
                 d_theta = 0.0; // Reset angle
@@ -165,7 +165,7 @@ int main(int argc, char** argv)
                double d_theta_2 = 2 * absvel * sampleTime * radius + d_theta;
 
                ref_traj_msg.x = radius + wp_x - radius * cos (d_theta);
-               ref_traj_msg.y = wp_x + radius * sin (d_theta);
+               ref_traj_msg.y = wp_y + radius * sin (d_theta);
                ref_traj_msg.z = wp_z;      
                
 
@@ -209,19 +209,31 @@ int main(int argc, char** argv)
             
         if (traj_type == 3)  // Read reference trajectory from a textfile
             { 
-                 trajectory_reset = true;
+                            if (trajectory_reset== true) {
+                // Reset trajectory to start from the beginning
+                d_theta = 0.0; // Reset angle
+                // Reset other variables if needed
 
-               ROS_INFO("--------External trajectory: Reading trajectory from txt file!--------"); 
-               while (inputFile >> wp_ext_x >> wp_ext_y >> wp_ext_z >> wp_ext_yaw)
-                      {
-                        ref_traj_msg.x =  wp_ext_x ;                                                                                                                                                                                                                                                                                                                              
-                        ref_traj_msg.y =  wp_ext_y ;
-                        ref_traj_msg.z =  wp_ext_z ; 
-                        ref_yaw_msg.data = wp_ext_yaw;
-                        ref_pos_pub.publish(ref_traj_msg);   
-                       }  
+                // Set the flag to true to indicate that the trajectory has been reset
+                trajectory_reset = false;
+            }
+               d_theta =  (absvel * sampleTime * radius + d_theta);
+               double d_theta_2 = 2 * absvel * sampleTime * radius + d_theta;
+                               ROS_INFO("--------Figure-8 trajectory!--------");
 
-             //  bool init_pos=1;        
+                double omega = M_PI / 20.0; // Frequency of the figure-8
+                double amplitude = 1.0;     // Amplitude of the figure-8
+
+                double x = -amplitude + amplitude * cos(d_theta);
+                double y = amplitude * sin(2 *  d_theta)/2;
+
+                ref_traj_msg.x = x + wp_x;
+                ref_traj_msg.y = y + wp_y;
+                ref_traj_msg.z = wp_z;
+
+                // Adjust yaw if needed
+               // ref_yaw_msg.data = wp_yaw * (M_PI / 180.0);
+                         
             }
 
         reg_on_pub.publish(reg_on_msg);
