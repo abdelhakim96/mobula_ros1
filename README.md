@@ -39,8 +39,19 @@ source install/local_setup.sh
 ros2 run mhe_lambda mhe_x_node 
 ```
 run all three nodes x ,y and z
+## Running the Nominal-GP
+```bash
+roslaunch gp_wind_regression gp_wind_regression_single.launch
+```
 
 
+## Running the DF-GP
+
+```bash
+roslaunch gp_wind_regression gp_wind_regression_combined.launch
+```
+
+and run ros2 nodes
  ## Running on simulated bluerov
 
   Create ROVType.txt file inside bin_Debug folder
