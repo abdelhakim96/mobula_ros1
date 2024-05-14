@@ -1,4 +1,7 @@
 # Start: simulation or real-brov?
+```bash
+checkout Mobula branch: Mobula_External_Controller_AHA
+```
  ## Running on simulated bluerov
 
   Create ROVType.txt file inside bin_Debug folder
