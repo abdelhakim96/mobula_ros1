@@ -9,16 +9,16 @@ folder_name = ""
 
 # Corrected file paths containing the recorded data
 
-file_name_gp_nogp = os.path.join(folder_name, "nogp.txt")
-file_name_gp_lambda01 = os.path.join(folder_name, "l1.txt")
-file_name_gp_lambda01_combined = os.path.join(folder_name, "l1.txt")
-file_name_gp_lambda8 = os.path.join(folder_name, "nogp.txt")
-file_name_gp_lambda8_combined = os.path.join(folder_name, "nogp.txt")
-file_name_gp_mac_sine = os.path.join(folder_name, "df.txt")
-file_name_gp_mac_test = os.path.join(folder_name, "df.txt")
-file_name_gp_lambda9_sine = os.path.join(folder_name, "nogp.txt")
-file_name_gp_lambda9_test = os.path.join(folder_name, "nogp.txt")
-file_name_nogp_test = os.path.join(folder_name, "nogp.txt")
+file_name_gp_nogp = os.path.join(folder_name, "nogpn.txt")
+file_name_gp_lambda01 = os.path.join(folder_name, "l1n.txt")
+file_name_gp_lambda01_combined = os.path.join(folder_name, "l1n.txt")
+file_name_gp_lambda8 = os.path.join(folder_name, "l8n.txt")
+file_name_gp_lambda8_combined = os.path.join(folder_name, "l8n.txt")
+file_name_gp_mac_sine = os.path.join(folder_name, "dfn.txt")
+file_name_gp_mac_test = os.path.join(folder_name, "dfn.txt")
+file_name_gp_lambda9_sine = os.path.join(folder_name, "l5n.txt")
+file_name_gp_lambda9_test = os.path.join(folder_name, "l5n.txt")
+file_name_nogp_test = os.path.join(folder_name, "nogpn.txt")
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -156,9 +156,9 @@ def plot_dist(ax, gt_y_values, label, t_start, duration, color):
 def plot_dist1(ax, gt_y_values, label, t_start, duration, color):
     ax.plot(np.array(range(t_start, t_start + duration))/10, gt_y_values[t_start:t_start + duration], label=label, color=color, linestyle='--', linewidth=4)
 
-t1 = 200
-t2 = 325
-t3 = 400
+t1 = 100
+t2 = 700
+t3 = 100
 
 plt.figure(figsize=(15, 10))
 
@@ -169,8 +169,8 @@ plot_trajectories(plt, ref_positions_x_gp_lambda01, ref_positions_y_gp_lambda01,
 #plt.plot(1.0 + 1.0*np.cos(theta), 1.0*np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
 plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t1, t2, color=colors[4])
 plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, 'Lambda = 1.0', t1, t2, color=colors[0])
-#plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8', t1, t2, color=colors[1])
-#plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t1, t2, color=colors[2])
+plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8', t1, t2, color=colors[1])
+plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t1, t2, color=colors[2])
 plot_trajectories(plt, actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine, 'DF-GP', t1, t2, color=colors[3])
 plt.legend(fontsize=30)
 plt.xlabel('X [m]', fontsize=30)
@@ -261,9 +261,9 @@ t_start = 0
 #duration = 820
 
 # Plot error for different values of lambda
-plot_dist1(plt, gt_y_1_scaled, mu_y_1, 'Lambda = 1', t_start, duration, color=colors[0])
-plot_dist1(plt, gt_y_1_scaled, mu_y_8, 'Lambda = 0.8', t_start, duration, color=colors[1])
-plot_dist1(plt, gt_y_1_scaled, mu_y_9, 'Lambda = 0.5', t_start, duration, color=colors[2])
+#plot_dist1(plt, gt_y_1_scaled, mu_y_1, 'Lambda = 1', t_start, duration, color=colors[0])
+#plot_dist1(plt, gt_y_1_scaled, mu_y_8, 'Lambda = 0.8', t_start, duration, color=colors[1])
+#plot_dist1(plt, gt_y_1_scaled, mu_y_9, 'Lambda = 0.5', t_start, duration, color=colors[2])
 #plot_dist1(plt, gt_y_1_scaled, mu_y_mac, 'DF-GP', t_start, duration, color=colors[3])
 
 # Add legend

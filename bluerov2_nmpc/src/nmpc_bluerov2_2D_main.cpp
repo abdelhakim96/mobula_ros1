@@ -417,8 +417,8 @@ int main(int argc, char** argv)
 
 
                 
-           online_data.distFx = dist_Fx.data;
-           online_data.distFy = dist_Fy.data;
+           online_data.distFx = dist_Fx.data ;
+           online_data.distFy = dist_Fy.data ;
            online_data.distFz = dist_Fx.data_zeros;
 
 
