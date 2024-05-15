@@ -216,9 +216,9 @@ def plot_dist(ax, gt_y_values, label, t_start, duration, color):
 def plot_dist1(ax, gt_y_values, label, t_start, duration, color):
     ax.plot(np.array(range(t_start, t_start + duration))/10, gt_y_values[t_start:t_start + duration], label=label, color=color, linestyle='--', linewidth=4)
 
-t1 = 100
-t2 = 450
-t3 = 100
+t1 = 1
+t2 = 500
+t3 = 500
 
 plt.figure(figsize=(15, 10))
 
@@ -241,7 +241,7 @@ plt.xticks(fontsize=20)
 plt.yticks(fontsize=20)
 
 t2 = t1 + t2
-t3 = 450
+t3 = 500
 
 
 plt.figure(figsize=(15, 10))
@@ -270,7 +270,7 @@ plt.figure(figsize=(15, 10))
 
 # Define t_start and duration
 t_start = 1
-duration = 700
+duration = 1200
 
 # Plot gt_y for each method with skipping every 5 points and increased line thickness
 plot_dist(plt, mu_y_1[::5], 'lambda = 1', t_start*5, duration // 5, color=colors[0])
@@ -286,7 +286,7 @@ scaled_t_start = t_start * 5
 plot_dist(plt, gt_y_1_scaled[::5], 'ground truth', scaled_t_start, duration // 5, color='black')
 
 
-plt.xlim(0, 69)
+plt.xlim(0, 100)
 plt.xlabel('Time [s]', fontsize=30)
 plt.ylabel('Disturbance [$\mathregular{m/s^2}$]', fontsize=30)
 plt.legend(fontsize=30)
@@ -306,7 +306,6 @@ plt.figure(figsize=(15, 10))
 
 # Define t_start and duration
 t_start = 0
-duration = 1700
 
 def plot_dist1(ax, gt_y_values, mu_y_values, label, t_start, duration, color):
     abs_error = [abs(gt - mu) for gt, mu in zip(gt_y_values[t_start:t_start + duration], mu_y_values[t_start:t_start + duration])]
@@ -329,6 +328,7 @@ plot_dist1(plt, gt_y_1_scaled, mu_y_mac, 'DF-GP', t_start, duration, color=color
 # Add legend
 plt.xticks(fontsize=30)
 plt.yticks(fontsize=30)
+plt.xlim(0, 99)
 
 plt.legend(fontsize=30)
 plt.xlabel('Time [s]', fontsize=30)
