@@ -9,16 +9,16 @@ folder_name = ""
 
 # Corrected file paths containing the recorded data
 
-file_name_gp_nogp = os.path.join(folder_name, "nogpn.txt")
-file_name_gp_lambda01 = os.path.join(folder_name, "l1n.txt")
-file_name_gp_lambda01_combined = os.path.join(folder_name, "l1n.txt")
-file_name_gp_lambda8 = os.path.join(folder_name, "l8n.txt")
-file_name_gp_lambda8_combined = os.path.join(folder_name, "l8n.txt")
-file_name_gp_mac_sine = os.path.join(folder_name, "dfn.txt")
-file_name_gp_mac_test = os.path.join(folder_name, "dfn.txt")
-file_name_gp_lambda9_sine = os.path.join(folder_name, "l5n.txt")
-file_name_gp_lambda9_test = os.path.join(folder_name, "l5n.txt")
-file_name_nogp_test = os.path.join(folder_name, "nogpn.txt")
+file_name_gp_nogp = os.path.join(folder_name, "testnogp.txt")
+file_name_gp_lambda01 = os.path.join(folder_name, "testl1.txt")
+file_name_gp_lambda01_combined = os.path.join(folder_name, "testl1.txt")
+file_name_gp_lambda8 = os.path.join(folder_name, "testl8.txt")
+file_name_gp_lambda8_combined = os.path.join(folder_name, "testl8.txt")
+file_name_gp_mac_sine = os.path.join(folder_name, "testdf.txt")
+file_name_gp_mac_test = os.path.join(folder_name, "testdf.txt")
+file_name_gp_lambda9_sine = os.path.join(folder_name, "testl5.txt")
+file_name_gp_lambda9_test = os.path.join(folder_name, "testl5.txt")
+file_name_nogp_test = os.path.join(folder_name, "testnogp.txt")
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -141,7 +141,67 @@ plt.figure(figsize=(15, 10))
 dur = duration
 t_end = dur   # Calculate end time
 
+# Calculate distance from each point in the trajectory to the closest point on the unit circle
+def distance_to_unit_circle_trajectory(x_positions, y_positions):
+    distances = []
+    for x, y in zip(x_positions, y_positions):
+        min_distance = float('inf')
+        for i in range(len(ref_positions_x_gp_nogp)):
+            unit_x = ref_positions_x_gp_nogp[i]
+            unit_y = ref_positions_y_gp_nogp[i]
+            distance = np.sqrt((x - unit_x)**2 + (y - unit_y)**2)
+            if distance < min_distance:
+                min_distance = distance
+        distances.append(min_distance)
+    return distances
 
+# Calculate distances for each dataset
+distances_gp_nogp_closest = distance_to_unit_circle_trajectory(actual_positions_x_gp_nogp, actual_positions_y_gp_nogp)
+distances_gp_lambda1_sine_closest = distance_to_unit_circle_trajectory(actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01)
+distances_gp_lambda8_sine_closest = distance_to_unit_circle_trajectory(actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8)
+distances_gp_mac_sine_closest = distance_to_unit_circle_trajectory(actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine)
+distances_gp_lambda9_sine_closest = distance_to_unit_circle_trajectory(actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine)
+
+# Calculate mean distances for each dataset
+mean_distance_gp_nogp_closest = np.mean(distances_gp_nogp_closest[:duration])
+mean_distance_gp_lambda01_sine_closest = np.mean(distances_gp_lambda1_sine_closest[:duration])
+mean_distance_gp_lambda8_sine_closest = np.mean(distances_gp_lambda8_sine_closest[:duration])
+mean_distance_gp_mac_sine_closest = np.mean(distances_gp_mac_sine_closest[:duration])
+mean_distance_gp_lambda9_sine_closest = np.mean(distances_gp_lambda9_sine_closest[:duration])
+
+
+
+
+
+print("nogp", mean_distance_gp_nogp_closest)
+print("1", mean_distance_gp_lambda01_sine_closest)
+print("8", mean_distance_gp_lambda8_sine_closest)
+print("df", mean_distance_gp_mac_sine_closest)
+print("5", mean_distance_gp_lambda9_sine_closest)
+
+
+pdf_file_path = "plots.pdf"
+pdf_pages = PdfPages(pdf_file_path)
+
+# Plotting the distances
+plt.figure(figsize=(15, 10))
+
+dur = duration
+t_end = dur   # Calculate end time
+
+# Plot the distances for each dataset
+skip = 5  # Skip every 5 points
+plt.plot(np.array(range(t_start, t_end, skip))/10, distances_gp_nogp_closest[t_start:t_end:skip], linewidth=4, color=colors[4], label=f'No GP')
+plt.plot(np.array(range(t_start, t_end, skip))/10, distances_gp_lambda1_sine_closest[t_start:t_end:skip], linewidth=4, color=colors[0], label=r'$\lambda = 1$')
+plt.plot(np.array(range(t_start, t_end, skip))/10, distances_gp_lambda8_sine_closest[t_start:t_end:skip], linewidth=4, color=colors[1], label=f'Lambda 0.8 (Mean: {mean_distance_gp_lambda8_sine_closest:.3g})')
+plt.plot(np.array(range(t_start, t_end, skip))/10, distances_gp_lambda9_sine_closest[t_start:t_end:skip], linewidth=4, color=colors[2], label=f'Lambda 0.5 (Mean: {mean_distance_gp_lambda9_sine_closest:.3g})')
+plt.plot(np.array(range(t_start, t_end, skip))/10, distances_gp_mac_sine_closest[t_start:t_end:skip], linewidth=4, color=colors[3], label=f'DF-GP')
+plt.xticks(fontsize=30)
+plt.yticks(fontsize=30)
+
+# Add labels and title
+plt.xlabel('Time (s)', fontsize=30)
+plt.ylabel('|Error| ($\mathregular{m}$)', fontsize=30)
 
 # Plotting Trajectories
 
@@ -157,7 +217,7 @@ def plot_dist1(ax, gt_y_values, label, t_start, duration, color):
     ax.plot(np.array(range(t_start, t_start + duration))/10, gt_y_values[t_start:t_start + duration], label=label, color=color, linestyle='--', linewidth=4)
 
 t1 = 100
-t2 = 700
+t2 = 450
 t3 = 100
 
 plt.figure(figsize=(15, 10))
@@ -181,7 +241,7 @@ plt.xticks(fontsize=20)
 plt.yticks(fontsize=20)
 
 t2 = t1 + t2
-t3 = 750
+t3 = 450
 
 
 plt.figure(figsize=(15, 10))
@@ -191,8 +251,8 @@ plt.figure(figsize=(15, 10))
 plot_trajectories(plt, ref_positions_x_gp_lambda01, ref_positions_y_gp_lambda01, 'Reference', t2, t3, color='black')
 plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t2, t3, color=colors[4])
 plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, 'Lambda = 1.0', t2, t3, color=colors[0])
-#plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8', t2, t3, color=colors[1])
-#plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t2, t3, color=colors[2])
+plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8', t2, t3, color=colors[1])
+plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t2, t3, color=colors[2])
 plot_trajectories(plt, actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine, 'DF-GP', t2, t3, color=colors[3])
 plt.legend(fontsize=30)
 plt.xlabel('X [m]', fontsize=30)
@@ -261,10 +321,10 @@ t_start = 0
 #duration = 820
 
 # Plot error for different values of lambda
-#plot_dist1(plt, gt_y_1_scaled, mu_y_1, 'Lambda = 1', t_start, duration, color=colors[0])
-#plot_dist1(plt, gt_y_1_scaled, mu_y_8, 'Lambda = 0.8', t_start, duration, color=colors[1])
-#plot_dist1(plt, gt_y_1_scaled, mu_y_9, 'Lambda = 0.5', t_start, duration, color=colors[2])
-#plot_dist1(plt, gt_y_1_scaled, mu_y_mac, 'DF-GP', t_start, duration, color=colors[3])
+plot_dist1(plt, gt_y_1_scaled, mu_y_1, 'Lambda = 1', t_start, duration, color=colors[0])
+plot_dist1(plt, gt_y_1_scaled, mu_y_8, 'Lambda = 0.8', t_start, duration, color=colors[1])
+plot_dist1(plt, gt_y_1_scaled, mu_y_9, 'Lambda = 0.5', t_start, duration, color=colors[2])
+plot_dist1(plt, gt_y_1_scaled, mu_y_mac, 'DF-GP', t_start, duration, color=colors[3])
 
 # Add legend
 plt.xticks(fontsize=30)
