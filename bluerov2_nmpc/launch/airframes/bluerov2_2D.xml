@@ -1,6 +1,6 @@
 <launch>
     <!-- bluerov2 -->
-    <param name="W_Wn_factor" type="double" value="10.0" /> <!-- Factor for WN weights. -->
+    <param name="W_Wn_factor" type="double" value="20.0" /> <!-- Factor for WN weights. -->
     <param name="F_x_ref" type="double" value="$(eval 0.0)" /> <!-- Reference for Force in x direction. -->
     <param name="F_y_ref" type="double" value="$(eval 0.0)" /> <!-- Reference for Force in y direction. -->
     <param name="F_z_ref" type="double" value="$(eval 3.95)" /> <!-- Reference for Force in z direction. -->
