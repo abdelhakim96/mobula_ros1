@@ -222,7 +222,7 @@ int main(int argc, char** argv)
                                ROS_INFO("--------Figure-8 trajectory!--------");
 
                 double omega = M_PI / 20.0; // Frequency of the figure-8
-                double amplitude = 1.0;     // Amplitude of the figure-8
+                double amplitude = 1.5;     // Amplitude of the figure-8
 
                 double x = -amplitude + amplitude * cos(d_theta);
                 double y = amplitude * sin(2 *  d_theta)/2;
