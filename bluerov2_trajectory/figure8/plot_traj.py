@@ -14,8 +14,17 @@ file_name_gp_nogp = os.path.join(folder_name, "nogpnn.txt")
 
 file_name_gp_lambda01 = os.path.join(folder_name, "l1test.txt")
 
-file_name_gp_mohit= os.path.join(folder_name, "mohit_gp_final.txt")
+
+#final mohit
+#file_name_gp_mohit= os.path.join(folder_name, "mohit_gp_final.txt")
 #file_name_gp_fsgp = os.path.join(folder_name, "fsgp.txt")
+
+
+#final results lambdas
+#file_name_gp_mohit= os.path.join(folder_name, "lambda1_final.txt")
+#file_name_gp_mohit= os.path.join(folder_name, "lambda8_final.txt")
+file_name_gp_mohit= os.path.join(folder_name, "lambda6_final.txt")
+
 
 file_name_gp_fsgp = os.path.join(folder_name, "fastagp.txt")
 
