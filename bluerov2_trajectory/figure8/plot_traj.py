@@ -12,17 +12,25 @@ folder_name = ""
 #file_name_gp_nogp = os.path.join(folder_name, "nogpnn.txt")
 file_name_gp_nogp = os.path.join(folder_name, "nogpnn.txt")
 
-file_name_gp_lambda01 = os.path.join(folder_name, "testl1nn.txt")
+file_name_gp_lambda01 = os.path.join(folder_name, "l1test.txt")
 
-file_name_gp_mohit= os.path.join(folder_name, "mohit_gp.txt")
+file_name_gp_mohit= os.path.join(folder_name, "mohit_gp_final.txt")
 #file_name_gp_fsgp = os.path.join(folder_name, "fsgp.txt")
 
 file_name_gp_fsgp = os.path.join(folder_name, "fastagp.txt")
 
 
 file_name_gp_lambda8 = os.path.join(folder_name, "testl8nn.txt")
-file_name_gp_mac_sine = os.path.join(folder_name, "testdfnn.txt")
-file_name_gp_mac_test = os.path.join(folder_name, "testdfnn.txt")
+#file_name_gp_mac_sine = os.path.join(folder_name, "testdfnn.txt")
+#file_name_gp_mac_test = os.path.join(folder_name, "testdfnn.txt")
+
+#file_name_gp_mac_sine = os.path.join(folder_name, "dft.txt")
+#file_name_gp_mac_test = os.path.join(folder_name, "dft.txt")
+
+file_name_gp_mac_sine = os.path.join(folder_name, "dft20.txt")
+file_name_gp_mac_test = os.path.join(folder_name, "dft20.txt")
+
+
 file_name_gp_lambda9_sine = os.path.join(folder_name, "idealnn.txt")
 file_name_gp_lambda9_test = os.path.join(folder_name, "testl5nn.txt")
 file_name_nogp_test = os.path.join(folder_name, "nogpnn.txt")

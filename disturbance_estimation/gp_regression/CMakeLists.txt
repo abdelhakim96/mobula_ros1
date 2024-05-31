@@ -59,16 +59,16 @@ catkin_package(
 #message(STATUS "libgp_BINARY_LOCATION = ${libgp_BINARY_LOCATION}")
 
 
-set(libgp_BINARY_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/../libgp_sparse/build")
+set(libgp_BINARY_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/../libgp_dense/build")
 message(STATUS "libgp_BINARY_LOCATION = ${libgp_BINARY_LOCATION}")
 
 
 include_directories(
     ${catkin_INCLUDE_DIRS}
     ${PROJECT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../libgp_sparse  # Adjust this path
-    ${CMAKE_CURRENT_SOURCE_DIR}/../libgp_sparse/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../libgp_sparse/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libgp_dense  # Adjust this path
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libgp_dense/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libgp_dense/src
 )
 
 # List of source files
