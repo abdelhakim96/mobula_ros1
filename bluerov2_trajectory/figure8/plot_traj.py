@@ -12,24 +12,24 @@ folder_name = ""
 #file_name_gp_nogp = os.path.join(folder_name, "nogpnn.txt")
 file_name_gp_nogp = os.path.join(folder_name, "nogpnn.txt")
 
-file_name_gp_lambda01 = os.path.join(folder_name, "l1test.txt")
+file_name_gp_lambda01 = os.path.join(folder_name, "lambda1_final.txt")
 
 
 #final mohit
-#file_name_gp_mohit= os.path.join(folder_name, "mohit_gp_final.txt")
+file_name_gp_mohit= os.path.join(folder_name, "mohit_gp_final.txt")
 #file_name_gp_fsgp = os.path.join(folder_name, "fsgp.txt")
 
 
 #final results lambdas
 #file_name_gp_mohit= os.path.join(folder_name, "lambda1_final.txt")
 #file_name_gp_mohit= os.path.join(folder_name, "lambda8_final.txt")
-file_name_gp_mohit= os.path.join(folder_name, "lambda6_final.txt")
+#file_name_gp_mohit= os.path.join(folder_name, "lambda6_final.txt")
 
 
 file_name_gp_fsgp = os.path.join(folder_name, "fastagp.txt")
 
 
-file_name_gp_lambda8 = os.path.join(folder_name, "testl8nn.txt")
+file_name_gp_lambda8 = os.path.join(folder_name, "lambda8_final.txt")
 #file_name_gp_mac_sine = os.path.join(folder_name, "testdfnn.txt")
 #file_name_gp_mac_test = os.path.join(folder_name, "testdfnn.txt")
 
@@ -41,7 +41,7 @@ file_name_gp_mac_test = os.path.join(folder_name, "dft20.txt")
 
 
 file_name_gp_lambda9_sine = os.path.join(folder_name, "idealnn.txt")
-file_name_gp_lambda9_test = os.path.join(folder_name, "testl5nn.txt")
+file_name_gp_lambda9_test = os.path.join(folder_name, "idealnn.txt")
 file_name_nogp_test = os.path.join(folder_name, "nogpnn.txt")
 import os
 import matplotlib.pyplot as plt
@@ -158,6 +158,7 @@ def read_data(file_path, ref_x_list, ref_y_list, actual_x_list, actual_y_list, W
                 W3_list.append(float(data[22]))
                 mu_y_list.append(float(data[27]))
                 gt_y_list.append(float(data[24]))
+            
 
     except Exception as e:
         print(f"Error reading data from {file_path}: {e}")
@@ -187,7 +188,7 @@ pdf_file_path = "plots.pdf"
 pdf_pages = PdfPages(pdf_file_path)
 
 
-
+'''
 # Plotting the distances
 plt.figure(figsize=(15, 10))
 
@@ -265,7 +266,7 @@ plt.xticks(fontsize=30)
 plt.yticks(fontsize=30)
 
 
-plt.legend(fontsize=25)
+plt.legend(fontsize=20)
 
 
 # Add labels and title
@@ -275,24 +276,29 @@ plt.grid(True)
 
 pdf_pages.savefig()
 
- #'''
+'''
 # Plotting Trajectories
 
 # Function to plot trajectories for a subset of data
-def plot_trajectories(ax, actual_x, actual_y, label, t_start, duration, color):
-    ax.plot(actual_x[t_start:t_start + duration], actual_y[t_start:t_start + duration], linewidth=4, label=label, color=color)
 
-def plot_traj(ax, actual_x, actual_y, label, t_start, duration, color):
+def plot_trajectories1(ax, actual_x, actual_y, label, t_start, duration, color):
+    ax.plot(actual_x[t_start:t_start + duration], actual_y[t_start:t_start + duration], linewidth=6, linestyle='--', label=label, color=color)
+
+
+def plot_trajectories(ax, actual_x, actual_y, label, t_start, duration, color):
+    ax.plot(actual_x[t_start:t_start + duration], actual_y[t_start:t_start + duration], linewidth=6, label=label, color=color)
+
+def plot_traj(ax1, actual_x, actual_y, label, t_start, duration, color):
     ax.plot(actual_x[t_start:t_start + duration], actual_y[t_start:t_start + duration], linewidth=6, label=label, color=color,linestyle='--')
 
 # Function to plot gt_y for each method
 def plot_dist(ax, gt_y_values, label, t_start, duration, color):
     ax.plot(np.array(range(t_start, t_start + duration))/2, gt_y_values[t_start:t_start + duration], label=label, color=color, linewidth=4)
 
-def plot_dist1(ax, gt_y_values, label, t_start, duration, color):
+def plot_dist1(ax1, gt_y_values, label, t_start, duration, color):
     ax.plot(np.array(range(t_start, t_start + duration))/10, gt_y_values[t_start:t_start + duration], label=label, color=color, linestyle='--', linewidth=4)
 
-duration = 415
+duration = 422
 t1 = 0
 t2 = t1 + duration
 t3 = t2 + duration
@@ -301,35 +307,37 @@ plt.figure(figsize=(15, 10))
 
 #plt.subplot(1, 2, 1)  # Subplot 1: First Cycle
 theta = np.linspace(0, 2*np.pi, 100)
-plot_traj(plt, ref_positions_x_gp_lambda01, ref_positions_y_gp_lambda01, 'Reference', t1, t2, color='black')
+#plot_traj(plt, ref_positions_x_gp_lambda01, ref_positions_y_gp_lambda01, 'Reference', t1, t2, color='black')
 
 
-plt.plot(1.0 + 1.0*np.cos(theta), 1.0*np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
-plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t1, duration, color=colors[0])
-plot_trajectories(plt, actual_positions_x_gp_mohit, actual_positions_y_gp_mohit, 'GP-MPC', t1, duration, color=colors[1])
+#plt.plot(1.0 + 1.0*np.cos(theta), 1.0*np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
+plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t1, duration, color=colors[4])
+plot_trajectories(plt, actual_positions_x_gp_mohit, actual_positions_y_gp_mohit, 'GP-MPC', t1, duration, color=colors[0])
 plot_trajectories(plt, actual_positions_x_gp_fsgp, actual_positions_y_gp_fsgp, 'Fast-ASGP', t1, duration, color=colors[2])
 #plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, 'Lambda = 1.0', t2, duration, color=colors[0])
 #plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8', t2, duration, color=colors[1])
 #plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t2, duration, color=colors[2])
 plot_trajectories(plt, actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine, 'DF-GP', t1, duration, color=colors[3])
+plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Ideal (No disturbance)', t1, duration, color=colors[1])
+plot_trajectories1(plt, ref_positions_x_gp_lambda01, ref_positions_y_gp_lambda01, 'Reference', t1, duration, color='grey')
 
 
+#plt.legend(fontsize=15)
 
-plt.legend(fontsize=20)
 plt.xlabel('X [m]', fontsize=30)
 plt.ylabel('Y [m]', fontsize=30)
-plt.title('First Cycle', fontsize=30)
+plt.title('First lemniscate cycle', fontsize=30)
 plt.gca().set_aspect('equal', adjustable='box')  # Equal aspect ratio
 plt.xticks(fontsize=20)
 plt.yticks(fontsize=20)
 
 
 times = [0, 150, 300]
-colorss = ['red', 'red', 'red']
+colorss = ['blue', 'blue', 'blue']
 labels = ["Start of trajectory", "Start of prediction", "Start of disturbance profile 2"]
 for time, color, label in zip(times, colorss, labels):
     idx = int(time)  # Adjusted for the time scale
-    plt.scatter(actual_positions_x_gp_lambda01[idx], actual_positions_y_gp_lambda01[idx], color=color, marker='x', s=500, zorder=10, linewidth=3)
+    plt.scatter(ref_positions_x_gp_lambda01[idx], ref_positions_y_gp_lambda01[idx], color=color, marker='x', s=500, zorder=10, linewidth=4)
     #plt.text(actual_positions_x_gp_lambda01[idx]+0.4, actual_positions_y_gp_lambda01[idx]+0.1, label, fontsize=15, color='black', ha='right')
 
 
@@ -349,9 +357,8 @@ plt.figure(figsize=(15, 10))
 
 
 
-plt.plot(1.0 + 1.0*np.cos(theta), 1.0*np.sin(theta), linestyle='--', linewidth=2, label='Reference', color='black')
-plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t2, duration, color=colors[0])
-plot_trajectories(plt, actual_positions_x_gp_mohit, actual_positions_y_gp_mohit, 'GP-MPC', t2, duration, color=colors[1])
+plot_trajectories(plt, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t2, duration, color=colors[4])
+plot_trajectories(plt, actual_positions_x_gp_mohit, actual_positions_y_gp_mohit, 'GP-MPC', t2, duration, color=colors[0])
 plot_trajectories(plt, actual_positions_x_gp_fsgp, actual_positions_y_gp_fsgp, 'Fast-ASGP', t2, duration, color=colors[2])
 #plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda01, 'Lambda = 1.0', t2, duration, color=colors[0])
 #plot_trajectories(plt, actual_positions_x_gp_lambda8, actual_positions_y_gp_lambda8, 'Lambda = 0.8', t2, duration, color=colors[1])
@@ -360,22 +367,32 @@ plot_trajectories(plt, actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac
 #plot_trajectories(plt, actual_positions_x_gp_lambda01, actual_positions_y_gp_lambda05, 'Ideal (No disturbance)', t2, duration, color=colors[0])
 
 
+plot_trajectories(plt, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Ideal (No disturbance)', t2, duration, color=colors[1])
+plot_trajectories1(plt, ref_positions_x_gp_lambda01, ref_positions_y_gp_lambda01, 'Reference', t2, duration, color='grey')
 
-plt.legend(fontsize=30)
+#plt.legend(fontsize=15)
 plt.xlabel('X [m]', fontsize=30)
 plt.ylabel('Y [m]', fontsize=30)
-plt.title('Second Cycle', fontsize=30)
+plt.title('Second lemniscate cycle', fontsize=30)
 plt.gca().set_aspect('equal', adjustable='box')  # Equal aspect ratio
 plt.xticks(fontsize=20)
 plt.yticks(fontsize=20)
 
+
+times = [600,695]
+colorss = ['blue','blue']
+labels = ["Start of disturbance profile 3", '70 seconds']
+for time, color, label in zip(times, colorss, labels):
+    idx = int(time)  # Adjusted for the time scale
+    plt.scatter(ref_positions_x_gp_lambda01[idx], ref_positions_y_gp_lambda01[idx], color=color, marker='x', s=500, zorder=10, linewidth=4)
+    #plt.text(actual_positions_x_gp_lambda01[idx]+0.4, actual_positions_y_gp_lambda01[idx]+0.1, label, fontsize=15, color='black', ha='right')
 
 
 plt.tight_layout()  # Adjust layout to prevent overlap
 
 pdf_pages.savefig()
 
-plt.figure(figsize=(15, 10))
+#plt.figure(figsize=(15, 10))
 
 
 
@@ -389,7 +406,13 @@ plt.figure(figsize=(15, 10))
 def plot_trajectories_3d(ax, actual_x, actual_y, label, t_start, duration, color, z_value):
     ax.plot(actual_x[t_start:t_start + duration], actual_y[t_start:t_start + duration], z_value, linewidth=4, label=label, color=color)
 
+def plot_trajectories_3d1(ax, actual_x, actual_y, label, t_start, duration, color, z_value):
+    ax.plot(actual_x[t_start:t_start + duration], actual_y[t_start:t_start + duration], z_value, linewidth=4, label=label, color=color)
+
 def plot_traj_3d(ax, actual_x, actual_y, label, t_start, duration, color, z_value):
+    ax.plot(actual_x[t_start:t_start + duration], actual_y[t_start:t_start + duration], z_value, linewidth=6, label=label, color=color, linestyle='--')
+
+def plot_traj_3d1(ax, actual_x, actual_y, label, t_start, duration, color, z_value):
     ax.plot(actual_x[t_start:t_start + duration], actual_y[t_start:t_start + duration], z_value, linewidth=6, label=label, color=color, linestyle='--')
 
 # Set fixed z value
@@ -416,10 +439,21 @@ ax.legend(fontsize=15)
 ax.set_xlabel('X [m]', fontsize=15)
 ax.set_ylabel('Y [m]', fontsize=15)
 #ax.set_zlabel('Z [m]', fontsize=15)
-ax.set_title('Lemniscate Trajectory', fontsize=20)
-ax.view_init(elev=30, azim=120)  # Adjust view angle for better visualization
+ax.text2D(0.1, 0.85, "First lemniscate cycle", transform=ax.transAxes, fontsize=15, color='black')
+ax.view_init(elev=25, azim=120)  # Adjust view angle for better visualization
 
-z_value2 = z_value + 1
+
+pdf_pages.savefig()
+
+
+#plt.figure(figsize=(15, 10))
+
+#fig = plt.figure(figsize=(15, 10))
+#ax = fig1.add_subplot(111, projection='3d')
+#ax.zaxis._axinfo['grid'].update(color='w', linewidth=0.0)
+
+
+z_value2 = z_value + 0.1
 # Second Cycle
 plot_traj_3d(ax, ref_positions_x_gp_lambda01, ref_positions_y_gp_lambda01, 'Reference', t2, duration, color='grey', z_value=z_value2)
 plot_trajectories_3d(ax, actual_positions_x_gp_nogp, actual_positions_y_gp_nogp, 'No GP', t2, duration, color=colors[4], z_value=z_value2)
@@ -430,7 +464,15 @@ plot_trajectories_3d(ax, actual_positions_x_gp_fsgp, actual_positions_y_gp_fsgp,
 #plot_trajectories_3d(ax, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Lambda = 0.5', t2, duration, color=colors[2], z_value=z_value2)
 plot_trajectories_3d(ax, actual_positions_x_gp_mac_sine, actual_positions_y_gp_mac_sine, 'DF-GP', t2, duration, color=colors[3], z_value=z_value2)
 plot_trajectories_3d(ax, actual_positions_x_gp_lambda9_sine, actual_positions_y_gp_lambda9_sine, 'Ideal (No disturbance)', t2, duration, color=colors[1], z_value=z_value2)
+ax.text2D(0.55, 0.4, "Second lemniscate cycle", transform=ax.transAxes, fontsize=15, color='black')
 
+
+#ax1.legend(fontsize=20)
+#ax1.set_xlabel('X [m]', fontsize=15)
+#ax1.set_ylabel('Y [m]', fontsize=15)
+#ax.set_zlabel('Z [m]', fontsize=15)
+#ax1.set_title('Second lemniscate cycle ', fontsize=20)
+#ax1.view_init(elev=25, azim=120)  # Adjust view angle for better visualization
 
 
 plt.tight_layout()  # Adjust layout to prevent overlap
@@ -518,7 +560,7 @@ plt.xlim(0, 100)
 
 plt.legend(fontsize=30)
 plt.xlabel('Time [s]', fontsize=30)
-plt.ylabel('Prediction Error [$\mathregular{m/s^2}$]', fontsize=30)
+plt.ylabel('|Error| [$\mathregular{m/s^2}$]', fontsize=30)
 #plt.title('Error in Prediction', fontsize=30)
 plt.grid(True)
 pdf_pages.savefig()
@@ -529,5 +571,31 @@ pdf_pages.savefig()
 
 pdf_pages.close()
 
+
+
+t_start = 0
+duration = 1000  # Duration for calculating mean error
+
+# Define function to calculate mean error
+def mean_error(gt, pred, start, duration):
+    gt_array = np.array(gt)
+    pred_array = np.array(pred)
+    return np.mean(np.abs(gt_array[start:start+duration] - pred_array[start:start+duration]))
+
+
+
+# Calculate and print mean prediction error for each method
+mean_error_mohit = mean_error(gt_y_1_scaled, mu_y_mohit, t_start, duration)
+mean_error_fsgp = mean_error(gt_y_1_scaled, mu_y_fsgp, t_start, duration)
+mean_error_mac = mean_error(gt_y_1_scaled, mu_y_mac, t_start, duration)
+
+print("Mean prediction error from 0 to 1000 points:")
+print(f"GP-MPC: {mean_error_mohit}")
+print(f"Fast-AGP: {mean_error_fsgp}")
+print(f"DF-GP: {mean_error_mac}")
 print("PDF saved successfully.")
+
+
 plt.show()
+
+

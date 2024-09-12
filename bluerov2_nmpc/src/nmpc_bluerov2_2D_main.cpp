@@ -48,9 +48,9 @@ void pos_cb(const nav_msgs::Odometry::ConstPtr& msg)
                         msg->twist.twist.angular.z};
 
 
-    //current_att_mat.setRotation(current_att_quat);
+    current_att_mat.setRotation(current_att_quat);
     //current_att_mat.getRPY(roll, pitch, yaw);
-    //current_att_mat.getRPY(pitch, roll, yaw);
+    current_att_mat.getRPY(pitch, roll, yaw);
     current_pos_att = {msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z, roll, pitch, yaw};
 }
 
@@ -222,7 +222,7 @@ int main(int argc, char** argv)
     ref_position_sub = nh.subscribe<geometry_msgs::Vector3>("ref_trajectory/position", 1, ref_position_cb);
     ref_velocity_sub = nh.subscribe<geometry_msgs::Vector3>("ref_trajectory/velocity", 1, ref_velocity_cb);
     ref_yaw_sub = nh.subscribe<std_msgs::Float64>("ref_trajectory/yaw", 1, ref_yaw_cb);
-    pos_sub = nh.subscribe<nav_msgs::Odometry>("/mobula/rov/odometry", 1, pos_cb);
+    pos_sub = nh.subscribe<nav_msgs::Odometry>("/qualisys/bluerov/odom", 1, pos_cb);
     //vel_sub = nh.subscribe<geometry_msgs::TwistStamped>("mavros/mocap/velocity_body", 1, vel_cb);
     dist_Fx_predInit_sub = nh.subscribe<std_msgs::Bool>(dist_Fx_predInit_topic, 1, dist_Fx_predInit_cb);
     dist_Fy_predInit_sub = nh.subscribe<std_msgs::Bool>(dist_Fy_predInit_topic, 1, dist_Fy_predInit_cb);
@@ -358,13 +358,13 @@ int main(int argc, char** argv)
 
             // Setting up state-feedback [x,y,z,u,v,w,psi,r]
             current_states = {current_pos_att.at(0),
-                              current_pos_att.at(1),
-                              current_pos_att.at(2),
+                              -current_pos_att.at(1),
+                              -current_pos_att.at(2),
                               current_vel_rate.at(0),
                               current_vel_rate.at(1),
                               current_vel_rate.at(2),
-                              angles.at(2),
-                              current_vel_rate.at(5)
+                              -current_pos_att.at(5),
+                              -current_vel_rate.at(5)
                               };
 
 
@@ -374,7 +374,7 @@ int main(int argc, char** argv)
                                       ref_velocity[0],   //u
                                       ref_velocity[1],   //v
                                       ref_velocity[2],   //w
-                                      ref_yaw_rad,
+                                      -ref_yaw_rad,
                                       0.0
                              };                   
 
@@ -397,8 +397,9 @@ int main(int argc, char** argv)
 
             
             std::cout << "ref  yaw = "<< ref_yaw_rad << std::endl ;
-            std::cout << "current yaw = "<< angles.at(2) << std::endl ;
+            std::cout << "current yaw = "<<         current_pos_att.at(5) << std::endl ;
 
+            std::cout << "hakim=122 " << std::endl ;
 
 
 

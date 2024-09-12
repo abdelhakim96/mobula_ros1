@@ -102,6 +102,14 @@ void write_data_to_file(const ros::TimerEvent& event) {
     double velocity_error_y = rov_odometry.twist.twist.linear.y - ref_velocity.y;
     double velocity_error_z = rov_odometry.twist.twist.linear.z - ref_velocity.z;
 
+
+    double velocity_x = rov_odometry.twist.twist.linear.x;
+
+    double velocity_y = rov_odometry.twist.twist.linear.y;
+
+    double velocity_z = rov_odometry.twist.twist.linear.z;
+
+
     print_results << std::setprecision(11);
     print_results << ref_position.x << "," << ref_position.y << "," << ref_position.z << ",";
     print_results << rov_odometry.pose.pose.position.x << "," << rov_odometry.pose.pose.position.y << "," << rov_odometry.pose.pose.position.z << ",";
@@ -128,6 +136,11 @@ void write_data_to_file(const ros::TimerEvent& event) {
 
     print_results << featx.data[0] << ",";
     print_results << featy.data[0] << ",";
+
+    print_results << velocity_x << ",";
+    print_results << velocity_y << ",";
+    print_results << velocity_z << ",";
+
     print_results << std::endl;
 }
 
