@@ -95,6 +95,24 @@ colcon build --symlink-install
 ```
 
 
+##  Install CasADi
+
+To install CasADi, open your terminal and run the following commands:
+
+```bash
+sudo apt update && \
+sudo apt install build-essential coinor-libipopt-dev gfortran liblapack-dev pkg-config --install-recommends swig && \
+pip3 install casadi && \
+cd && \
+git clone https://github.com/casadi/casadi.git -b master casadi && \
+cd casadi && \
+mkdir build && \
+cd build && \
+cmake -DWITH_PYTHON=ON -DWITH_IPOPT=ON -DWITH_OPENMP=ON -DWITH_THREAD=ON .. && \
+make && \
+sudo make install
+```
+
 
 
 # Running the simulation
