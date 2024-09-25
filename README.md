@@ -34,6 +34,8 @@ checkout Mobula branch using SVN: https://heket.eiva.com/svn/NaviSuite/features/
 
 
 
+
+
 # Start: simulation or real brov?
 ```bash
 checkout Mobula branch using SVN: https://heket.eiva.com/svn/NaviSuite/features/Mobula/Mobula_External_Controller_AHA/
@@ -75,6 +77,15 @@ sudo apt-get install ros-noetic-mavros ros-noetic-mavros-msgs
 
 ```
 
+
+## build gp library
+navigate to the `libgp_sparse` folder and create a `build` directory.
+
+```bash
+cd libgp_sparse
+mkdir -p build
+cd build
+```
 
 
 ## Run ROS-Bridge
