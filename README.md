@@ -33,6 +33,53 @@ checkout Mobula branch using SVN: https://heket.eiva.com/svn/NaviSuite/features/
 ```
 
 
+## 7. Install some ros dependencies
+
+```bash
+sudo apt-get install python3-catkin-tools
+sudo apt install python3-colcon-common-extensions
+sudo apt-get install ros-noetic-mavros ros-noetic-mavros-msgs
+```
+
+
+## 8. build gp library
+navigate to the `libgp_sparse` folder and create a `build` directory.
+
+```bash
+cd libgp_sparse
+mkdir -p build
+cd build
+```
+
+
+
+## 9. Install CasADi
+
+To install CasADi, open your terminal and run the following commands:
+
+```bash
+sudo apt update && \
+sudo apt install build-essential coinor-libipopt-dev gfortran liblapack-dev pkg-config --install-recommends swig && \
+pip3 install casadi && \
+cd && \
+git clone https://github.com/casadi/casadi.git -b master casadi && \
+cd casadi && \
+mkdir build && \
+cd build && \
+cmake -DWITH_PYTHON=ON -DWITH_IPOPT=ON -DWITH_OPENMP=ON -DWITH_THREAD=ON .. && \
+make && \
+sudo make install
+```
+
+
+## 10. Build ROS packages
+
+
+```bash
+colcon build --symlink-install
+```
+
+
 
 
 
@@ -69,49 +116,7 @@ checkout Mobula branch using SVN: https://heket.eiva.com/svn/NaviSuite/features/
 
 
 
-##  Install some ros dependencies
 
-```bash
-sudo apt-get install python3-catkin-tools
-sudo apt install python3-colcon-common-extensions
-sudo apt-get install ros-noetic-mavros ros-noetic-mavros-msgs
-```
-
-
-## build gp library
-navigate to the `libgp_sparse` folder and create a `build` directory.
-
-```bash
-cd libgp_sparse
-mkdir -p build
-cd build
-```
-
-## Build ROS packages
-
-
-```bash
-colcon build --symlink-install
-```
-
-
-##  Install CasADi
-
-To install CasADi, open your terminal and run the following commands:
-
-```bash
-sudo apt update && \
-sudo apt install build-essential coinor-libipopt-dev gfortran liblapack-dev pkg-config --install-recommends swig && \
-pip3 install casadi && \
-cd && \
-git clone https://github.com/casadi/casadi.git -b master casadi && \
-cd casadi && \
-mkdir build && \
-cd build && \
-cmake -DWITH_PYTHON=ON -DWITH_IPOPT=ON -DWITH_OPENMP=ON -DWITH_THREAD=ON .. && \
-make && \
-sudo make install
-```
 
 
 
