@@ -1,6 +1,12 @@
 
 # Installation Guide
 
+## System Overview
+The simulator (Mobula) runs on Windows, while the control and estimation code runs on the Linux side in ROS. This includes some ROS1 packages (MPC and GP) and ROS2 packages (dynamically weighting different GPs).
+
+---
+
+
 ## 1. Install Visual Studio (VS 2022)
 Ensure that you have all the necessary libraries installed.
 Follow this guide for installation:
@@ -31,6 +37,10 @@ C:\ProgramData\EIVA\Mobula\MobulaConfigurationFiles\BlueROV2
 ```bash
 checkout Mobula branch using SVN: https://heket.eiva.com/svn/NaviSuite/features/Mobula/Mobula_External_Controller_AHA/
 ```
+
+
+---
+
 
 
 ## 7. Install some ros dependencies
