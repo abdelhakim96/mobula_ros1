@@ -66,10 +66,10 @@ checkout Mobula branch using SVN: https://heket.eiva.com/svn/NaviSuite/features/
 
 
 
-# Running the simulation
 
 
-##  some ros depencies
+
+##  Install some ros dependencies
 
 ```bash
 sudo apt-get install python3-catkin-tools
@@ -87,7 +87,7 @@ mkdir -p build
 cd build
 ```
 
-
+# Running the simulation
 ## Run ROS-Bridge
 ```bash
 source /opt/ros/noetic/setup.bash
