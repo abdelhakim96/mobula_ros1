@@ -73,8 +73,8 @@ checkout Mobula branch using SVN: https://heket.eiva.com/svn/NaviSuite/features/
 
 ```bash
 sudo apt-get install python3-catkin-tools
+sudo apt install python3-colcon-common-extensions
 sudo apt-get install ros-noetic-mavros ros-noetic-mavros-msgs
-
 ```
 
 
@@ -86,6 +86,16 @@ cd libgp_sparse
 mkdir -p build
 cd build
 ```
+
+## Build ROS packages
+
+
+```bash
+colcon build --symlink-install
+```
+
+
+
 
 # Running the simulation
 ## Run ROS-Bridge
